@@ -1,0 +1,21 @@
+[project]
+name = "ukcrimepy"
+version = "0.1.0"
+description = "Async Python wrapper for the UK Police Data API."
+authors = [{ name = "Daniel Whelan", email = "danieljwhelan@protonmail.com" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.11.4",
+    "tenacity>=9.1.2",
+    "aiolimiter>=1.2.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "mypy"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
