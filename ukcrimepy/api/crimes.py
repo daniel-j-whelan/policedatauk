@@ -2,10 +2,13 @@ from .base import BaseAPI
 from models.crime import CrimeCategory, CrimeReport
 from typing import List
 
+
 class CrimeAPI(BaseAPI):
-    async def get_crimes_at_location(self, lat: float, lng: float) -> List[CrimeReport]:
+    async def get_crimes_at_location(self, lat: float, lon: float) -> List[CrimeReport]:
         async with self.limiter:
-            response = await self.client.get(f"{self.base_url}/crimes-at-location?lat={lat}&lng={lng}")
+            response = await self.client.get(
+                f"{self.base_url}/crimes-at-location?lat={lat}&lng={lon}"
+            ) 
         data = response.json()
         return [CrimeReport(**crime) for crime in data]
 

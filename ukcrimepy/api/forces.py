@@ -4,6 +4,7 @@ from models.force import Force, ForceSummary, Person
 from typing import List
 from utils import async_retry
 
+
 class ForceAPI(BaseAPI):
     async def get_all_forces(self) -> List[Force]:
         """Return a list of all police forces (basic summary only)."""
