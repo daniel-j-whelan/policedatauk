@@ -1,14 +1,18 @@
 import asyncio
-from .base import BaseAPI
+import polars as pl
+from base import BaseAPI
 from models.force import Force, ForceSummary, Person
 from typing import List
 from utils import async_retry
 
 
 class ForceAPI(BaseAPI):
-    async def get_all_forces(self) -> List[Force]:
+    async def get_all_forces(self, to_polars: bool = False) -> List[Force]:
         """Return a list of all police forces (basic summary only)."""
         response = await self._throttle_get_request(f"{self.base_url}/forces")
+        if to_polars:
+            return pl.json_normalize(response.json())
+            return [Force(**force_data) for force_data in forces_data]
         forces_data = response.json()
         return [ForceSummary(**force_data) for force_data in forces_data]
 
