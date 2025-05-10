@@ -19,6 +19,11 @@ class PoliceAPI:
 
     @cached_property
     def last_updated(self) -> str:
+        """Return the last updated date of the crimes database.
+        
+        Returns:
+            str: The last updated date of the crimes database.
+        """
         url = f"{self.police_url}/crime-last-updated"
         response = self.throttle_get_request(url)
         return response.json()["date"]

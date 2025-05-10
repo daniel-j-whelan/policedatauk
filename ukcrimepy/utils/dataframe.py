@@ -5,6 +5,12 @@ def json_to_df(json_data: Dict[str, Any]) -> pl.DataFrame:
     """Converts a list of JSON objects into a Polars DataFrame.
     
     Uses pl.DataFrame for flat data, pl.json_normalize for nested data.
+
+    Args:
+        json_data (Dict[str, Any]): A JSON object.
+    
+    Returns:
+        A Polars DataFrame.
     """
     if not json_data:
         return pl.DataFrame()
@@ -18,6 +24,14 @@ def json_to_df(json_data: Dict[str, Any]) -> pl.DataFrame:
         return pl.DataFrame(json_data)
 
 def handle_empty_strings(df: pl.DataFrame) -> pl.DataFrame:
+    """Handle empty strings in a Polars DataFrame.
+
+    Args:
+        df (pl.DataFrame): The input DataFrame.
+
+    Returns:
+        DataFrame with empty strings handled.
+    """
     return df.with_columns([
         pl.col(col).str.strip_chars().replace("", None)
         for col, dtype in df.schema.items() if dtype == pl.String
@@ -73,6 +87,12 @@ def clean_polars_df(df: pl.DataFrame) -> pl.DataFrame:
     - Strip whitespace from string columns
     - Parse ISO datetime columns (if named 'date', 'datetime', or 'timestamp')
     - Drop rows with no meaningful data
+
+    Args:
+        df (pl.DataFrame): The input DataFrame.
+
+    Returns:
+        DataFrame with cleaned data.
     """
     return (
         df

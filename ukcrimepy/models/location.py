@@ -2,6 +2,15 @@ from pydantic import BaseModel, Field
 from typing import Dict
 
 class StreetLocation(BaseModel):
+    """Represents a street location.
+    
+    Args:
+        latitude (str): Latitude of the street location.
+
+        longitude (str): Longitude of the street location.
+        
+        street (Dict[str, str]): Street details of the street location.
+    """
     latitude: str
     longitude: str
     street: Dict[str, str]

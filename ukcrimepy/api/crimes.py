@@ -13,7 +13,11 @@ class CrimeAPI(BaseAPI):
         return [CrimeReport(**crime) for crime in data]
 
     async def get_crime_categories(self) -> List[CrimeCategory]:
-        """Return a list of all crime categories."""
+        """Return a list of all crime categories.
+        
+        Returns:
+            List[CrimeCategory]: A list of all crime categories.
+        """
         response = await self._throttle_get_request(f"{self.base_url}/crime-categories")
         categories_data = response.json()
         return [CrimeCategory(**category) for category in categories_data]

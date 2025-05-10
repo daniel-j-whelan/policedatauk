@@ -9,7 +9,13 @@ class BaseAPI:
         self.base_url = base_url
 
     async def _throttle_get_request(self, url: str) -> httpx.Response:
-        """Throttle the numebr of GET requests to avoid overwhelming the endpoint."""
+        """Throttle the numebr of GET requests to avoid overwhelming the endpoint.
+
+        Args:
+            url (str): The URL to make the GET request to.
+
+        Returns:
+            httpx.Response: The response from the GET request."""
         async with self.limiter:
             response = await self.client.get(url)
             if response.status_code == 429:

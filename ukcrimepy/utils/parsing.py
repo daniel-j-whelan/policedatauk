@@ -12,8 +12,7 @@ LAT_LON_REGEX = re.compile(
 )
 
 def parse_lat_lon(coord: str) -> Tuple[float, float]:
-    """
-    Parse a latitude/longitude pair from a flexible string format.
+    """Parse a latitude/longitude pair from a flexible string format.
     
     Accepts formats like:
     - "52.123,-1.456"
@@ -21,6 +20,12 @@ def parse_lat_lon(coord: str) -> Tuple[float, float]:
     - "52.123 -1.456"
     - "52.123    -1.456"
     - With or without trailing spaces
+
+    Args:
+        coord (str): The coordinate string to parse.
+
+    Returns:
+        Tuple[float, float]: The latitude and longitude.
 
     Raises:
         ValueError if the pattern doesn't match.
