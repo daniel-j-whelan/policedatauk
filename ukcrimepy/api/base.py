@@ -1,6 +1,7 @@
 from httpx import AsyncClient, HTTPStatusError, Response
 from aiolimiter import AsyncLimiter
 
+
 class BaseAPI:
     def __init__(self, client: AsyncClient, limiter: AsyncLimiter, base_url: str):
         self.client = client
