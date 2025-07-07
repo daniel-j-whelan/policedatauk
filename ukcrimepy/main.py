@@ -66,7 +66,7 @@
 #     # await test_get_all_forces()
 #     # await test_get_5_forces()
 #     # await test_get_20_forces_with_rate_limiting()
-    
+
 #     # await test_get_postcode_info()
 #     await test_get_crime_categories()
 
@@ -81,6 +81,7 @@ from api.crimes import CrimeAPI
 from api.forces import ForceAPI
 from api.postcodes import PostcodeAPI
 
+
 class PoliceAPI:
     def __init__(self):
         self.client = httpx.AsyncClient()
@@ -90,13 +91,33 @@ class PoliceAPI:
         self.crimes = CrimeAPI(self.client, self.limiter, self.police_url)
         self.forces = ForceAPI(self.client, self.limiter, self.police_url)
         self.postcodes = PostcodeAPI(self.client, self.limiter, self.postcode_url)
-        
-        
+
+
 async def main():
     api = PoliceAPI()
-    # Example usage
+
     crime_categories = await api.crimes.get_crime_categories()
-    for crime in crime_categories: print(crime.name)
-    
+    print(crime_categories)
+
+    force_summaries = await api.forces.get_all_forces()
+    for force in force_summaries:
+        print(force.name)
+
+    specific_forces = await api.forces.get_specific_forces(
+        ["metropolitan", "leicestershire"]
+    )
+    for force in specific_forces:
+        print(force)
+
+    postcode_info = await api.postcodes.get_postcode_info("SW1A 1AA")
+    print(postcode_info)
+
+    crimes_at_location = await api.crimes.get_crimes_at_location(
+        lat=51.5014, lon=-0.1419, date="2023-09"
+    )
+    for crime in crimes_at_location:
+        print(f"{crime}")
+
+
 if __name__ == "__main__":
     asyncio.run(main())
