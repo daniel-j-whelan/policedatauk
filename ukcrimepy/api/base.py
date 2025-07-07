@@ -7,7 +7,7 @@ class BaseAPI:
         self.client = client
         self.limiter = limiter
         self.base_url = base_url
-        
+
     async def _throttle_get_request(self, url: str) -> Response:
         """Perform a GET request with rate limiting.
 

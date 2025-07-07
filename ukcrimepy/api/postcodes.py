@@ -1,6 +1,5 @@
 from .base import BaseAPI
 from models.postcode import PostCode
-from typing import List
 
 
 class PostcodeAPI(BaseAPI):
@@ -43,10 +42,10 @@ class PostcodeAPI(BaseAPI):
 
     async def is_valid_postcode(self, postcode: str) -> bool:
         """Check if a postcode is valid.
-        
+
         Args:
             postcode (str): The postcode to check.
-        
+
         Returns:
             bool: True if the postcode is valid, False otherwise.
         """

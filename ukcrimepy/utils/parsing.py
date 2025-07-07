@@ -8,12 +8,14 @@ LAT_LON_REGEX = re.compile(
         \s*[, ]\s*              # separator: comma, space, or both
         (-?\d+(?:\.\d+)?)       # longitude: group 2
         \s*$                    # optional trailing whitespace
-    """, re.VERBOSE
+    """,
+    re.VERBOSE,
 )
+
 
 def parse_lat_lon(coord: str) -> Tuple[float, float]:
     """Parse a latitude/longitude pair from a flexible string format.
-    
+
     Accepts formats like:
     - "52.123,-1.456"
     - "52.123, -1.456"

@@ -1,4 +1,3 @@
-
 def validate_lat(lat: float) -> None:
     """
     Validate a latitude value.
@@ -16,6 +15,7 @@ def validate_lat(lat: float) -> None:
         raise ValueError("Latitude must be between -90 and 90 degrees.")
         # return False
     return True
+
 
 def validate_lon(lon: float) -> None:
     """Validate a longitude value.

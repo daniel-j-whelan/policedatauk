@@ -6,6 +6,7 @@ from crimes import CrimeAPI
 from forces import ForceAPI
 from postcodes import PostcodeAPI
 
+
 class PoliceAPI:
     def __init__(self):
         self.client = httpx.AsyncClient()
@@ -16,17 +17,17 @@ class PoliceAPI:
         self.forces = ForceAPI(self.client, self.limiter, self.police_url)
         self.postcodes = PostcodeAPI(self.client, self.limiter, self.postcode_url)
 
-
     @cached_property
     def last_updated(self) -> str:
         """Return the last updated date of the crimes database.
-        
+
         Returns:
             str: The last updated date of the crimes database.
         """
         url = f"{self.police_url}/crime-last-updated"
         response = self.throttle_get_request(url)
         return response.json()["date"]
+
 
 async def main():
     api = PoliceAPI()
@@ -37,6 +38,7 @@ async def main():
     force_summaries = await api.forces.get_all_forces()
     for force in force_summaries:
         print(force.name)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
