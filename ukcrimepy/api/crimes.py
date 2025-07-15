@@ -20,16 +20,18 @@ class CrimeAPI(BaseAPI):
         Returns:
             List[CrimeReport]: A list of crime reports for the specified location.
         """
-        async with self.limiter:
-            response = await self.client.get(
-                f"{self.base_url}/crimes-at-location?date={date}&lat={lat}&lng={lon}"
-            )
+        params={"date": date, "lat": lat, "lng": lon}
+        response = await self._throttle_get_request(
+            f"{self.base_url}/crimes-at-location",
+            params=params
+        )
         data = response.json()
         return [CrimeReport(**crime) for crime in data]
 
 
     async def get_crimes_no_location(
-        self, date: str | None = None,
+        self,
+        date: str | None = None,
         force: str | None = None,
         category: str | None = None
     ) -> List[CrimeReport]:
@@ -49,7 +51,10 @@ class CrimeAPI(BaseAPI):
             List[CrimeReport]: A list of crime reports.
         """
         params = {"date": date, "force": force, "category": category}
-        response = await self._throttle_get_request(f"{self.base_url}/crimes-no-location", params=params)
+        response = await self._throttle_get_request(
+            f"{self.base_url}/crimes-no-location",
+            params=params
+        )
         data = response.json()
         return [CrimeReport(**crime) for crime in data]
     
