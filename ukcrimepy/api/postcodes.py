@@ -13,6 +13,10 @@ class PostcodeAPI(BaseAPI):
             dict: The detailed information of the postcode.
         """
         postcode = postcode.replace(" ", "").upper()
+        valid_postcode = await self.is_valid_postcode(postcode)
+        if not valid_postcode:
+            raise ValueError(f"Invalid postcode: {postcode}")
+        
         response = await self._throttle_get_request(
             f"https://api.postcodes.io/postcodes/{postcode}"
         )
