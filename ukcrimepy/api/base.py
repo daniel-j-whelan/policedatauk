@@ -1,6 +1,6 @@
 from httpx import AsyncClient, HTTPStatusError, Response
 from aiolimiter import AsyncLimiter
-
+from utils import async_retry
 
 class BaseAPI:
     def __init__(self, client: AsyncClient, limiter: AsyncLimiter, base_url: str):
@@ -8,11 +8,19 @@ class BaseAPI:
         self.limiter = limiter
         self.base_url = base_url
 
-    async def _throttle_get_request(self, url: str) -> Response:
+    @async_retry()
+    async def _throttle_get_request(
+        self,
+        url: str,
+        params: dict | None = None
+    ) -> Response:
         """Perform a GET request with rate limiting.
 
         Args:
             url (str): URL of the request.
+
+            params (dict, optional): Query parameters for the request.
+                Defaults to None.
 
         Returns:
             Response: The server response.
@@ -21,7 +29,7 @@ class BaseAPI:
             HTTPStatusError: If the response status code is 429 (rate limit exceeded).
         """
         async with self.limiter:
-            response = await self.client.get(url)
+            response = await self.client.get(url, params=params)
             if response.status_code == 429:
                 raise HTTPStatusError(
                     "Rate limit exceeded (429)",
