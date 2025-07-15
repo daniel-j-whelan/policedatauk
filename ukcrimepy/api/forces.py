@@ -3,7 +3,6 @@ import polars as pl
 from .base import BaseAPI
 from models.force import Force, ForceSummary, Person
 from typing import List
-from utils import async_retry
 
 
 class ForceAPI(BaseAPI):
@@ -22,7 +21,6 @@ class ForceAPI(BaseAPI):
             return pl.json_normalize(forces_data)
         return [ForceSummary(**force_data) for force_data in forces_data]
 
-    @async_retry()
     async def get_force(self, force_id: str) -> Force:
         """Return a specific police force by ID.
 
