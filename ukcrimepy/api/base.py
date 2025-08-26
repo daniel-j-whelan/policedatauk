@@ -17,13 +17,13 @@ class BaseAPI:
         """Perform a GET request with rate limiting.
 
         Args:
-            url (str): URL of the request.
+            url: URL of the request.
 
-            params (dict, optional): Query parameters for the request.
+            params: Query parameters for the request.
                 Defaults to None.
 
         Returns:
-            Response: The server response.
+            The server response.
 
         Exceptions:
             HTTPStatusError: If the response status code is 429 (rate limit exceeded).

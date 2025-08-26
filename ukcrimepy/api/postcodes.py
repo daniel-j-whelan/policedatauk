@@ -7,10 +7,10 @@ class PostcodeAPI(BaseAPI):
         """Return the detailed information of a postcode.
 
         Args:
-            postcode (str): The postcode to get information for.
+            postcode: The postcode to get information for.
 
         Returns:
-            dict: The detailed information of the postcode.
+            The detailed information of the postcode.
         """
         postcode = postcode.replace(" ", "").upper()
         valid_postcode = await self.is_valid_postcode(postcode)
@@ -29,9 +29,9 @@ class PostcodeAPI(BaseAPI):
         """Get the postcode for a specific lat/lon.
 
         Args:
-            lat (float): The latitude.
+            lat: The latitude.
 
-            lon (float): The longitude.
+            lon: The longitude.
 
         Returns:
             PostCode: The postcode.
@@ -48,10 +48,10 @@ class PostcodeAPI(BaseAPI):
         """Check if a postcode is valid.
 
         Args:
-            postcode (str): The postcode to check.
+            postcode: The postcode to check.
 
         Returns:
-            bool: True if the postcode is valid, False otherwise.
+            True if the postcode is valid, False otherwise.
         """
         postcode = postcode.replace(" ", "").upper()
         response = await self._throttle_get_request(

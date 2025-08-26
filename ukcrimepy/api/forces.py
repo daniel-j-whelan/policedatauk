@@ -10,10 +10,10 @@ class ForceAPI(BaseAPI):
         """Return a list of all police forces (basic summary only).
 
         Args:
-            to_polars (bool, optional): If True, return a Polars DataFrame. Defaults to False.
+            to_polars (optional): If True, return a Polars DataFrame. Defaults to False.
 
         Returns:
-            List[Force]: A list of all police forces (basic summary only).
+            A list of all police forces (basic summary only).
         """
         response = await self._throttle_get_request(f"{self.base_url}/forces")
         forces_data = response.json()
@@ -25,10 +25,10 @@ class ForceAPI(BaseAPI):
         """Return a specific police force by ID.
 
         Args:
-            force_id (str): The ID of the police force.
+            force_id: The ID of the police force.
 
         Returns:
-            Force: A specific police force.
+            A specific police force.
         """
         response = await self._throttle_get_request(
             f"{self.base_url}/forces/{force_id}"
@@ -41,10 +41,10 @@ class ForceAPI(BaseAPI):
         """Return a list of police forces by ID in bulk.
 
         Args:
-            force_ids (List[str]): A list of police force IDs.
+            force_ids: A list of police force IDs.
 
         Returns:
-            List[Force]: A list of police forces.
+            A list of police forces.
         """
         tasks = [self.get_force(force_id) for force_id in force_ids]
         return await asyncio.gather(*tasks)
@@ -53,10 +53,10 @@ class ForceAPI(BaseAPI):
         """Return a list of people (officers) in a specific police force.
 
         Args:
-            force_id (str): The ID of the police force.
+            force_id: The ID of the police force.
 
         Returns:
-            List[Person]: A list of people (officers) in a specific police force.
+            A list of people (officers) in a specific police force.
         """
         response = await self._throttle_get_request(
             f"{self.base_url}/forces/{force_id}/people"
