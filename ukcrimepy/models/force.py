@@ -16,9 +16,6 @@ class EngagementMethod(BaseModel):
 
         title (str): The title of the engagement method.
 
-    Returns:
-        None
-
     Exceptions:
         ValidationError: If the data is invalid.
     """
@@ -54,9 +51,6 @@ class ForceSummary(BaseModel):
 
         name (str): The name of the police force.
 
-    Returns:
-        None
-
     Exceptions:
         ValidationError: If the data is invalid.
     """
@@ -91,9 +85,6 @@ class Force(BaseModel):
 
         name (str): The name of the police force.
 
-    Returns:
-        None
-
     Exceptions:
         ValidationError: If the data is invalid.
     """
@@ -121,9 +112,6 @@ class Person(BaseModel):
         bio (str): HTML-formatted biography text.
 
         contact_details (dict): Contact information if available.
-
-    Returns:
-        None
 
     Exceptions:
         ValidationError: If the data is invalid.

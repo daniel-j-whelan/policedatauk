@@ -58,9 +58,6 @@ class PostCode(BaseModel):
 
         codes (dict): The codes of the postcode.
 
-    Returns:
-        None
-
     Exceptions:
         ValidationError: If the data is invalid.
     """
