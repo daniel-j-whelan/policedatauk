@@ -1,6 +1,7 @@
 from .base import BaseAPI
 from models.postcode import PostCode
-
+from utils.validation import validate_lat, validate_lon
+from httpx import HTTPStatusError
 
 class PostcodeAPI(BaseAPI):
     async def get_postcode_info(self, postcode: str) -> dict:
@@ -16,10 +17,12 @@ class PostcodeAPI(BaseAPI):
         valid_postcode = await self.is_valid_postcode(postcode)
         if not valid_postcode:
             raise ValueError(f"Invalid postcode: {postcode}")
-        
-        response = await self._throttle_get_request(
-            f"https://api.postcodes.io/postcodes/{postcode}"
-        )
+        try:
+            response = await self._throttle_post_request(
+                f"https://api.postcodes.io/postcodes/{postcode}"
+            )
+        except HTTPStatusError as e:
+            raise ValueError(f"API error: {e}")
         data = response.json()
         if data["status"] != 200 or not data["result"]:
             raise ValueError(f"API error: {data.get('error', 'Unknown')}")
@@ -36,7 +39,9 @@ class PostcodeAPI(BaseAPI):
         Returns:
             PostCode: The postcode.
         """
-        response = await self._throttle_get_request(
+        validate_lat(lat)
+        validate_lon(lon)
+        response = await self._throttle_post_request(
             f"https://api.postcodes.io/postcodes?lat={lat}&lon={lon}"
         )
         data = response.json()
@@ -54,12 +59,10 @@ class PostcodeAPI(BaseAPI):
             True if the postcode is valid, False otherwise.
         """
         postcode = postcode.replace(" ", "").upper()
-        response = await self._throttle_get_request(
+        response = await self._throttle_post_request(
             f"https://api.postcodes.io/postcodes/{postcode}/validate"
         )
         data = response.json()
         if data["status"] != 200:
             raise ValueError(f"API error: {data.get('error', 'Unknown')}")
-        if data["result"] is None:
-            return False
-        return True
+        return data["result"]

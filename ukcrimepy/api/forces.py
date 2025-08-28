@@ -15,7 +15,7 @@ class ForceAPI(BaseAPI):
         Returns:
             A list of all police forces (basic summary only).
         """
-        response = await self._throttle_get_request(f"{self.base_url}/forces")
+        response = await self._throttle_post_request(f"{self.base_url}/forces")
         forces_data = response.json()
         if to_polars:
             return pl.json_normalize(forces_data)
@@ -30,7 +30,7 @@ class ForceAPI(BaseAPI):
         Returns:
             A specific police force.
         """
-        response = await self._throttle_get_request(
+        response = await self._throttle_post_request(
             f"{self.base_url}/forces/{force_id}"
         )
         force_data = response.json()
@@ -58,7 +58,7 @@ class ForceAPI(BaseAPI):
         Returns:
             A list of people (officers) in a specific police force.
         """
-        response = await self._throttle_get_request(
+        response = await self._throttle_post_request(
             f"{self.base_url}/forces/{force_id}/people"
         )
         people_data = response.json()
