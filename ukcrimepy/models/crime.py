@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from .location import StreetLocation
-from typing import Dict
+from typing import Dict, List
 
 
 class CrimeCategory(BaseModel):
@@ -58,7 +58,7 @@ class CrimeReport(BaseModel):
     persistent_id: str | None = None
 
 
-class CrimeOutcome(BaseModel):
+class LocationOutcome(BaseModel):
     """Represents a crime outcome.
 
     Args:
@@ -75,3 +75,26 @@ class CrimeOutcome(BaseModel):
     date: str
     person_id: str | None = None
     crime: StreetLocation
+
+
+class CrimeOutcome(BaseModel):
+    """Represents a crime outcome.
+
+    Args:
+        category (Dict[str, str]): Category of the crime outcome.
+
+        date (str): Date of the crime outcome.
+
+        person_id (str | None, optional): Person ID of the crime outcome.
+
+        crime (StreetLocation): Crime location of the crime outcome.
+    """
+
+    category: Dict[str, str]
+    date: str
+    person_id: str | None = None
+
+
+class CrimeWithOutcomes(BaseModel):
+    crime: CrimeReport
+    outcomes: List[CrimeOutcome]
