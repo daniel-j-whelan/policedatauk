@@ -56,7 +56,9 @@ def parse_polygon(polygon: str | Polygon) -> str:
     if isinstance(polygon, Polygon):
         if not polygon.is_valid:
             raise ValueError("Invalid polygon provided.")
-        api_polygon = ":".join(f"{lat},{lon}" for lon, lat in polygon.exterior.coords[:-1])
+        api_polygon = ":".join(
+            f"{lat},{lon}" for lon, lat in polygon.exterior.coords[:-1]
+        )
     elif isinstance(polygon, str):
         polygon_obj = wkt.loads(polygon)
         if not polygon_obj.is_valid:
