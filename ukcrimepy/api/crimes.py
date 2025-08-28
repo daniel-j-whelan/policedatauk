@@ -1,40 +1,19 @@
 from .base import BaseAPI
 from utils.parsing import parse_polygon
 from utils.validation import validate_date, validate_lat, validate_lon
-from models.crime import CrimeCategory, CrimeReport
+from utils.geo import buffer_point
+from models.crime import CrimeCategory, CrimeWithOutcomes, CrimeReport
 from typing import List
 
 
 class CrimeAPI(BaseAPI):
-    ###### NOT A FAN OF THIS ENDPOINT ######
-    # async def get_crimes_at_location(
-    #     self, lat: float, lon: float, date: str | None = None
-    # ) -> List[CrimeReport]:
-    #     """Get crimes at a specific location.
-
-    #     Args:
-    #         lat: Latitude of the location.
-
-    #         lon: Longitude of the location.
-
-    #         date: Date to filter crimes by (YYYY-MM).
-    #             Defaults to None.
-
-    #     Returns:
-    #         A list of crime reports for the specified location.
-    #     """
-    #     params={"date": date, "lat": lat, "lng": lon}
-    #     response = await self._throttle_get_request(
-    #         f"{self.base_url}/crimes-at-location",
-    #         params=params
-    #     )
-    #     data = response.json()
-    #     return [CrimeReport(**crime) for crime in data]
+    """API for retrieving crime reports."""
 
     async def get_crimes_by_location(
         self,
         lat: float | None = None,
         lon: float | None = None,
+        radius: int | None = None,
         poly: str | None = None,
         date: str | None = None,
     ) -> List[CrimeReport]:
@@ -47,6 +26,9 @@ class CrimeAPI(BaseAPI):
             lon: Longitude of the location.
                 Defaults to None.
 
+            radius: The radius (in meters) to search for crimes around the location.
+                Defaults to None.
+
             poly: A polygon to filter crimes by.
                 Defaults to None.
 
@@ -56,33 +38,36 @@ class CrimeAPI(BaseAPI):
         Returns:
             A list of crime reports for the specified location.
         """
-        if not poly and not (lat or lon):
+        params = {}
+        if not poly and not (lat and lon):
             raise ValueError("Either 'poly' or both 'lat' and 'lon' must be provided.")
 
-        if poly:
-            parsed_poly = parse_polygon(poly)
-            params = {"poly": parsed_poly}
-        else:
+        if (lat and lon):
             validate_lat(lat)
             validate_lon(lon)
-            params = {"lat": lat, "lng": lon}
+            if radius:
+                poly = buffer_point(lat, lon, radius)
+                parsed_poly = parse_polygon(poly)
+            else:
+                poly = buffer_point(lat, lon, 1000) #Default 1000m buffer
+
+        parsed_poly = parse_polygon(poly)
 
         if date:
             validate_date(date)
             params["date"] = date
+        params["poly"] = parsed_poly
 
         response = await self._throttle_post_request(
-            f"{self.base_url}/crimes-street/all-crime", params=params
+            f"{self.base_url}/crimes-street/all-crime", data=params
         )
-        print(response.url)
-        print(params)
         data = response.json()
         return [CrimeReport(**crime) for crime in data]
 
     async def get_crimes_no_location(
         self,
+        force: str,
         date: str | None = None,
-        force: str | None = None,
         category: str | None = None,
     ) -> List[CrimeReport]:
         """Return a list of crimes without a specific location.
@@ -100,7 +85,14 @@ class CrimeAPI(BaseAPI):
         Returns:
             A list of crime reports.
         """
-        params = {"date": date, "force": force, "category": category}
+        params = {"force": force}
+        if date:
+            validate_date(date)
+            params["date"] = date
+        if category:
+            params["category"] = category
+        else:
+            params["category"] = "all-crime"
         response = await self._throttle_post_request(
             f"{self.base_url}/crimes-no-location", data=params
         )
@@ -120,7 +112,7 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/outcomes-for-crime/{crime_id}"
         )
         data = response.json()
-        return CrimeReport(**data)
+        return CrimeWithOutcomes(**data)
 
     async def get_crime_categories(self) -> List[CrimeCategory]:
         """Return a list of all crime categories.
@@ -128,6 +120,8 @@ class CrimeAPI(BaseAPI):
         Returns:
             A list of all crime categories.
         """
-        response = await self._throttle_post_request(f"{self.base_url}/crime-categories")
+        response = await self._throttle_post_request(
+            f"{self.base_url}/crime-categories"
+        )
         categories_data = response.json()
         return [CrimeCategory(**category) for category in categories_data]
