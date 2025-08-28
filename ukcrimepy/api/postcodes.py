@@ -3,6 +3,7 @@ from models.postcode import PostCode
 from utils.validation import validate_lat, validate_lon
 from httpx import HTTPStatusError
 
+
 class PostcodeAPI(BaseAPI):
     async def get_postcode_info(self, postcode: str) -> dict:
         """Return the detailed information of a postcode.
@@ -18,7 +19,7 @@ class PostcodeAPI(BaseAPI):
         if not valid_postcode:
             raise ValueError(f"Invalid postcode: {postcode}")
         try:
-            response = await self._throttle_post_request(
+            response = await self._throttle_get_request(
                 f"https://api.postcodes.io/postcodes/{postcode}"
             )
         except HTTPStatusError as e:
@@ -41,7 +42,7 @@ class PostcodeAPI(BaseAPI):
         """
         validate_lat(lat)
         validate_lon(lon)
-        response = await self._throttle_post_request(
+        response = await self._throttle_get_request(
             f"https://api.postcodes.io/postcodes?lat={lat}&lon={lon}"
         )
         data = response.json()
@@ -59,7 +60,7 @@ class PostcodeAPI(BaseAPI):
             True if the postcode is valid, False otherwise.
         """
         postcode = postcode.replace(" ", "").upper()
-        response = await self._throttle_post_request(
+        response = await self._throttle_get_request(
             f"https://api.postcodes.io/postcodes/{postcode}/validate"
         )
         data = response.json()
