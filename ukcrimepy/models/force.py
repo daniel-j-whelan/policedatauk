@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from typing import Optional
 
 class EngagementMethod(BaseModel):
     """Represents a single engagement method for a police force.
@@ -123,8 +123,8 @@ class Person(BaseModel):
     rank: str = Field(
         ..., description="Rank of the officer.", examples=["Chief Constable"]
     )
-    bio: str = Field(
-        ...,
+    bio: Optional[str] = Field(
+        None,
         description="HTML-formatted biography text.",
         examples=["<p>John Doe is the Chief Constable of...</p>"],
     )
