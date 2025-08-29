@@ -1,71 +1,46 @@
 import polars as pl
-from collections.abc import MutableMapping
-from models.crime import CrimeWithOutcomes
-from typing import Dict, List, Any
+from pydantic import BaseModel
+from typing import List
+
+from models import CrimeWithOutcomes, CrimeReport
 
 
-def json_to_df(json_data: Dict[str, Any]) -> pl.DataFrame:
-    """Converts a list of JSON objects into a Polars DataFrame.
+def pydantic_to_df(model_list: List[BaseModel], sep="_") -> pl.DataFrame:
+    """Converts a list of Pydantic models into a Polars DataFrame.
 
     Uses pl.DataFrame for flat data, pl.json_normalize for nested data.
 
     Args:
-        json_data (Dict[str, Any]): A JSON object.
+        model_list: A list of Pydantic models.
+
+        sep: The separator to use when flattening the data.
+            Defaults to "_".
 
     Returns:
         A Polars DataFrame.
     """
-    if not json_data:
-        return pl.DataFrame()
-
-    # Check if any top-level values are nested
-    nested = any(isinstance(k, (Dict, List)) for k in json_data.keys())
-
-    if nested:
-        return pl.json_normalize(json_data)
-    else:
-        return pl.DataFrame(json_data)
+    df = pl.json_normalize(
+        [model.model_dump(exclude_none=True, mode="json") for model in model_list],
+        separator=sep,
+    )
+    return df
 
 
-def flatten_dict(d: MutableMapping, parent_key: str = "", sep: str = "_") -> dict:
-    """Recursively flattens a nested dictionary.
-
-    Args:
-        d: The dictionary to flatten.
-
-        parent_key: The base key string for the current level of recursion.
-            Defaults to an empty string.
-
-        sep: The separator to use between keys.
-            Defaults to "_".
-
-    Example:
-        {"a": {"b": 1, "c": 2}} -> {"a_b": 1, "a_c": 2}
-    """
-    items = []
-    for k, v in d.items():
-        new_key = f"{parent_key}{sep}{k}" if parent_key else k
-        if isinstance(v, MutableMapping):
-            items.extend(flatten_dict(v, new_key, sep=sep).items())
-        else:
-            items.append((new_key, v))
-    return dict(items)
-
-
-def crime_reports_to_polars(crime_reports: list, sep: str = "_") -> pl.DataFrame:
+def crime_reports_to_df(crime_reports: List[CrimeReport]) -> pl.DataFrame:
     """Convert a list of CrimeReport models into a flattened Polars DataFrame.
 
     Args:
         crime_reports: A list of CrimeReport models.
 
-        sep: The separator to use between keys.
-            Defaults to "_".
-
     Returns:
         A Polars DataFrame with flattened data.
     """
-    records = [flatten_dict(crime.dict(), sep=sep) for crime in crime_reports]
-    df = pl.DataFrame(records)
+    if isinstance(crime_reports, (CrimeReport,)):  # single object
+        crime_list = [crime_reports]
+    else:
+        crime_list = crime_reports
+
+    df = pydantic_to_df(crime_list)
     df = df.rename(
         {
             "location_latitude": "latitude",
@@ -79,13 +54,14 @@ def crime_reports_to_polars(crime_reports: list, sep: str = "_") -> pl.DataFrame
     return df
 
 
-def crimes_with_outcomes_to_polars(
+def crimes_with_outcomes_to_df(
     cwo_input: list[CrimeWithOutcomes], id: str
 ) -> pl.DataFrame:
     """Convert a list of CrimeWithOutcomes models into a flattened Polars DataFrame.
 
     Args:
         cwo_input: A list of CrimeWithOutcomes models.
+
         id: The persistent_id of the crime report to filter by.
 
     Returns:
@@ -96,23 +72,28 @@ def crimes_with_outcomes_to_polars(
     else:
         cwo_list = cwo_input
 
-    rows = []
-    for cwo in cwo_list:
-        crime_dict = flatten_dict(cwo.crime.dict(), sep="_")
-        for outcome in cwo.outcomes:
-            row = crime_dict | flatten_dict(outcome.dict(), sep="_")
-            rows.append(row)
-    df = pl.DataFrame(rows)
+    # Build a Polars DF
+    df = pydantic_to_df(cwo_list)
+
+    # Explode outcomes so each row = 1 outcome
+    df = df.explode("outcomes")
+
+    # Flatten nested dicts (crime.*, outcomes.*)
+    df = pl.json_normalize(df.to_dicts(), separator="_")
+
+    # Rename for clarity
     df = df.rename(
         {
-            "location_latitude": "latitude",
-            "location_longitude": "longitude",
-            "location_street_id": "street_id",
-            "location_street_name": "street_name",
-            "date": "outcome_date",
+            "crime_location_latitude": "latitude",
+            "crime_location_longitude": "longitude",
+            "crime_location_street_id": "street_id",
+            "crime_location_street_name": "street_name",
+            "outcomes_date": "outcome_date",
+            "outcomes_category_name": "outcome_category_name",
+            "outcomes_category_code": "outcome_category_code",
         }
     )
-    df = df.with_columns(persistent_id=pl.lit(id))
+
     return df
 
 
