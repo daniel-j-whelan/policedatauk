@@ -23,6 +23,7 @@ def buffer_point(lat: float, lon: float, radius_m: float, output: str = "wkt") -
     local_aeqd = pyproj.CRS.from_proj4(
         f"+proj=aeqd +lat_0={lat} +lon_0={lon} +units=m +datum=WGS84"
     )
+    # ^ This one is for you Andy!
 
     # Transformers
     project_to_local = pyproj.Transformer.from_crs(
@@ -35,7 +36,7 @@ def buffer_point(lat: float, lon: float, radius_m: float, output: str = "wkt") -
     # Create point and buffer in metres
     point = Point(lon, lat)
     point_local = transform(project_to_local, point)
-    buffered_local = point_local.buffer(radius_m)
+    buffered_local = point_local.buffer(radius_m, resolution=3)
 
     # Reproject back to WGS84
     buffered_wgs84 = transform(project_to_wgs84, buffered_local)
