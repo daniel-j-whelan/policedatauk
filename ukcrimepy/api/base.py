@@ -4,6 +4,8 @@ from utils.retry import async_retry
 
 
 class BaseAPI:
+    """Base class for API interactions with rate limiting and retry logic."""
+
     def __init__(self, client: AsyncClient, limiter: AsyncLimiter, base_url: str):
         self.client = client
         self.limiter = limiter
@@ -11,15 +13,21 @@ class BaseAPI:
 
     @async_retry()
     async def _throttle_post_request(
-        self, url: str, data: dict | None = None
+        self, url: str, params: dict | None = None, json_mode: bool = False
     ) -> Response:
         """Perform a POST request with rate limiting.
 
         Args:
             url: URL of the request.
 
-            data: The data to include in the POST request.
+            params: The data to include in the POST request.
                 Defaults to None.
+
+            json_mode: If True, send as JSON body (application/json).
+                If False, send as form-encoded (application/x-www-form-urlencoded).
+                Defaults to False.
+                True is used for Postcodes.io API.
+                False is used for UK Police API.
 
         Returns:
             The server response.
@@ -27,9 +35,12 @@ class BaseAPI:
         Exceptions:
             HTTPStatusError: If the response status code is 429 (rate limit exceeded).
         """
-        headers = {"Content-Type": "application/json"}
         async with self.limiter:
-            response = await self.client.post(url, json=data, headers=headers)
+            if json_mode:
+                response = await self.client.post(url, json=params)
+            else:
+                response = await self.client.post(url, data=params)
+
             if response.status_code == 429:
                 raise HTTPStatusError(
                     "Rate limit exceeded (429)",

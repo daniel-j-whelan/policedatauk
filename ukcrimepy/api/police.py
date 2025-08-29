@@ -7,6 +7,8 @@ from .postcodes import PostcodeAPI
 
 
 class PoliceAPI:
+    """Main class for interacting with the UK Police API and Postcodes.io API."""
+
     def __init__(self):
         self.client = httpx.AsyncClient()
         self.limiter = AsyncLimiter(15, 1.0)

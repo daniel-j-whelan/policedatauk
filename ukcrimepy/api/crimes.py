@@ -1,13 +1,11 @@
 from .base import BaseAPI
-from utils.parsing import parse_polygon
-from utils.validation import validate_date, validate_lat, validate_lon
-from utils.geo import buffer_point
-from models.crime import CrimeCategory, CrimeWithOutcomes, CrimeReport
+from utils import buffer_point, parse_polygon, validate_date, validate_lat, validate_lon
+from models import CrimeCategory, CrimeWithOutcomes, CrimeReport
 from typing import List
 
 
 class CrimeAPI(BaseAPI):
-    """API for retrieving crime reports."""
+    """Crime-related API methods for the UK Police API."""
 
     async def get_crimes_by_location(
         self,
@@ -42,14 +40,14 @@ class CrimeAPI(BaseAPI):
         if not poly and not (lat and lon):
             raise ValueError("Either 'poly' or both 'lat' and 'lon' must be provided.")
 
-        if (lat and lon):
+        if lat and lon:
             validate_lat(lat)
             validate_lon(lon)
             if radius:
                 poly = buffer_point(lat, lon, radius)
                 parsed_poly = parse_polygon(poly)
             else:
-                poly = buffer_point(lat, lon, 1000) #Default 1000m buffer
+                poly = buffer_point(lat, lon, 1000)  # Default 1000m buffer
 
         parsed_poly = parse_polygon(poly)
 
@@ -57,9 +55,8 @@ class CrimeAPI(BaseAPI):
             validate_date(date)
             params["date"] = date
         params["poly"] = parsed_poly
-
         response = await self._throttle_post_request(
-            f"{self.base_url}/crimes-street/all-crime", data=params
+            f"{self.base_url}/crimes-street/all-crime", params=params
         )
         data = response.json()
         return [CrimeReport(**crime) for crime in data]
@@ -73,14 +70,13 @@ class CrimeAPI(BaseAPI):
         """Return a list of crimes without a specific location.
 
         Args:
-            date: The date for which to retrieve crimes.
-                Defaults to None, which retrieves all crimes.
-
             force: The police force to filter crimes by.
-                Defaults to None, which retrieves crimes from all forces.
 
             category: The crime category to filter by.
                 Defaults to None, which retrieves all categories.
+
+            date: The date for which to retrieve crimes.
+                Defaults to None, which retrieves all crimes.
 
         Returns:
             A list of crime reports.
@@ -94,7 +90,7 @@ class CrimeAPI(BaseAPI):
         else:
             params["category"] = "all-crime"
         response = await self._throttle_post_request(
-            f"{self.base_url}/crimes-no-location", data=params
+            f"{self.base_url}/crimes-no-location", params=params
         )
         data = response.json()
         return [CrimeReport(**crime) for crime in data]

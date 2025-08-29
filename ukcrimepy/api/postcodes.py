@@ -1,12 +1,14 @@
 from .base import BaseAPI
-from models.postcode import PostCode
-from utils.validation import validate_lat, validate_lon
+from models import PostCode
+from utils import validate_lat, validate_lon
 from httpx import HTTPStatusError
 
 
 class PostcodeAPI(BaseAPI):
+    """Postcode-related API methods for the Postcodes.io API."""
+
     async def get_postcode_info(self, postcode: str) -> dict:
-        """Return the detailed information of a postcode.
+        """Return detailed information about a postcode.
 
         Args:
             postcode: The postcode to get information for.
@@ -17,11 +19,13 @@ class PostcodeAPI(BaseAPI):
         postcode = postcode.replace(" ", "").upper()
         valid_postcode = await self.is_valid_postcode(postcode)
         if not valid_postcode:
+            # Need to create custom exception
             raise ValueError(f"Invalid postcode: {postcode}")
         try:
             response = await self._throttle_get_request(
                 f"https://api.postcodes.io/postcodes/{postcode}"
             )
+        # Need to handle HTTPStatusError separately to provide better error messages
         except HTTPStatusError as e:
             raise ValueError(f"API error: {e}")
         data = response.json()
@@ -66,4 +70,5 @@ class PostcodeAPI(BaseAPI):
         data = response.json()
         if data["status"] != 200:
             raise ValueError(f"API error: {data.get('error', 'Unknown')}")
+        # Result is either True or False
         return data["result"]
