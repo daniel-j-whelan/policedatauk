@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
+
 class EngagementMethod(BaseModel):
     """Represents a single engagement method for a police force.
 
