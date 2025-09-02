@@ -1,6 +1,6 @@
 from .crime import CrimeCategory, CrimeReport, CrimeWithOutcomes
 from .force import Force, ForceSummary, Person
-from .neighbourhood import Neighbourhood
+from .neighbourhood import Neighbourhood, NeighbourhoodSummary, NeighbourhoodResult
 from .postcode import PostCode
 
 __all__ = [
@@ -10,6 +10,8 @@ __all__ = [
     "Force",
     "ForceSummary",
     "Neighbourhood",
+    "NeighbourhoodSummary",
+    "NeighbourhoodResult",
     "Person",
     "PostCode",
 ]
