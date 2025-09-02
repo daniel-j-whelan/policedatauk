@@ -34,12 +34,23 @@ class NeighbourhoodLinks(BaseModel):
     )
 
 
+class NeighbourhoodResult(BaseModel):
+    """Result from /locate-neighbourhood endpoint.
+
+    Args:
+        force (str): The ID of the police force.
+        neighbourhood (str): The ID of the neighbourhood.
+    """
+
+    force: str
+    neighbourhood: str
+
+
 class NeighbourhoodSummary(BaseModel):
     """Represents the basic summary information returned by /neighbourhoods endpoint.
 
     Args:
         id (str): The ID of the neighbourhood.
-
         name (str): The name of the neighbourhood.
 
     Exceptions:
@@ -83,8 +94,8 @@ class NeighbourhoodLocation(BaseModel):
     """
 
     name: str | None = Field(None, description="Name of the location.")
-    longitude: str = Field(..., description="Longitude of the location.")
-    latitude: str = Field(..., description="Latitude of the location.")
+    longitude: str | None = Field(None, description="Longitude of the location.")
+    latitude: str | None = Field(None, description="Latitude of the location.")
     postcode: str | None = Field(None, description="Postcode of the location.")
     address: str | None = Field(None, description="Address of the location.")
     telephone: str | None = Field(None, description="Telephone number of the location.")
@@ -127,9 +138,7 @@ class Neighbourhood(BaseModel):
     description: str | None = Field(
         None, description="Description of the neighbourhood."
     )
-    url: str = Field(..., description="URL of the neighbourhood.")
     links: list[NeighbourhoodLinks] = Field(..., description="List of follow-on links.")
-    telephone: str = Field(..., description="Telephone number of the neighbourhood.")
     id: str = Field(..., description="ID of the neighbourhood.")
     centre: dict = Field(
         ..., description="Latitude and longitude of the neighbourhood's centre point."
