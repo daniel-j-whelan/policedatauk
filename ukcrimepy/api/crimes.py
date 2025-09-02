@@ -45,7 +45,6 @@ class CrimeAPI(BaseAPI):
             validate_lon(lon)
             if radius:
                 poly = buffer_point(lat, lon, radius)
-                parsed_poly = parse_polygon(poly)
             else:
                 poly = buffer_point(lat, lon, 1000)  # Default 1000m buffer
 
