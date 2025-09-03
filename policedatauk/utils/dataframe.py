@@ -19,8 +19,10 @@ RENAME_MAP = {
         "outcomes_date": "outcome_date",
         "outcomes_category_name": "outcome_category",
         "outcomes_category_code": "outcome_code",
-    }
+    },
 }
+
+
 def pydantic_to_df(
     models: BaseModel | List[BaseModel],
     sep: str = "_",
@@ -60,6 +62,7 @@ def pydantic_to_df(
     elif rename:
         df = df.rename(rename)
     return df
+
 
 def handle_empty_strings(df: pl.DataFrame) -> pl.DataFrame:
     """Handle empty strings in a Polars DataFrame.

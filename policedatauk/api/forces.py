@@ -4,6 +4,7 @@ from typing import List
 from .base import BaseAPI
 from ..models import Force, ForceSummary, Person
 
+
 class ForceAPI(BaseAPI):
     """Force-related API methods for the UK Police API."""
 

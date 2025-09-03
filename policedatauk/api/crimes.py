@@ -1,7 +1,13 @@
 from typing import List
 
 from .base import BaseAPI
-from ..utils import buffer_point, parse_polygon, validate_date, validate_lat, validate_lon
+from ..utils import (
+    buffer_point,
+    parse_polygon,
+    validate_date,
+    validate_lat,
+    validate_lon,
+)
 from ..models import CrimeCategory, CrimeWithOutcomes, CrimeReport
 
 

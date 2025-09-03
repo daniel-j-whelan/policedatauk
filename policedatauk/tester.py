@@ -1,6 +1,5 @@
 import asyncio
 from api.police import PoliceAPI
-from utils import buffer_point
 from utils.dataframe import crime_reports_to_df, crimes_with_outcomes_to_df
 import polars as pl
 
@@ -37,39 +36,6 @@ async def test_forces():
             print(person)
 
 
-import requests
-
-
-async def test_boundary(to_geojson=True):
-    """Test fetching and converting neighbourhood boundary data."""
-    # Get the boundary data
-    url = "https://data.police.uk/api/leicestershire/NC04/boundary"
-    resp = requests.get(url)
-    data = resp.json()
-
-    if to_geojson:
-        # Convert to GeoJSON format
-        coordinates = [
-            [[float(point["longitude"]), float(point["latitude"])] for point in data]
-        ]
-        geojson = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": {"name": "NC04"},
-                    "geometry": {"type": "Polygon", "coordinates": coordinates},
-                }
-            ],
-        }
-        print(geojson)
-    else:
-        # Convert to a polyline format
-        poly = ":".join([f"{point['latitude']},{point['longitude']}" for point in data])
-
-        print(poly)
-
-
 async def test_neighbourhood():
     test_force = "lincolnshire"
     police = PoliceAPI()
@@ -80,7 +46,7 @@ async def test_neighbourhood():
     )
     for person in neighbourhood_staff:
         print(person)
-    geojson_boundary, polygon = await police.neighbourhoods.get_boundary(
+    _, polygon = await police.neighbourhoods.get_boundary(
         test_force, neighbourhoods[0].id
     )
     # print(geojson_boundary)
