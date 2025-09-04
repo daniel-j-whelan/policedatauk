@@ -52,4 +52,5 @@ uv.lock
 
 # Local config files
 *.local
-ukcrimepy/tester.py
+map.html
+policedatauk/tester.py
