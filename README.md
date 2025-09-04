@@ -2,7 +2,7 @@
 
 > A modern, async-first Python client for the [UK Police Data API](https://data.police.uk/), with Pydantic models and Polars integration.
 
-[![CI](https://github.com/daniel-j-whelan/policedatauk/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/ukcrimepy/actions/workflows/ci.yml)
+[![CI](https://github.com/daniel-j-whelan/policedatauk/actions/workflows/ci.yml/badge.svg)](https://github.com/daniel-j-whelan/policedatauk/actions/workflows/ci.yml)
 [![PyPI version](https://badge.fury.io/py/policedatauk.svg)](https://pypi.org/project/policedatauk/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -45,16 +45,17 @@ pip install policedatauk[geo]
 import asyncio
 from policedatauk import PoliceClient
 
+
 async def main():
     async with PoliceClient() as client:
-        # Get all forces
+        # Get all forcess
         forces = await client.forces.get_all_forces()
         print(forces[0])
 
         # Crimes in a polygon (January 2024)
-        crimes = await client.crimes.get_all_crimes(
+        crimes = await client.crimes.get_crimes_no_location(
             date="2024-01",
-            poly="POLYGON (( ))"
+            force=forces[0].id,
         )
         print(crimes)
 
@@ -68,35 +69,20 @@ asyncio.run(main())
 All Pydantic models can be normalised into Polars for analysis:
 
 ```python
-from ukcrimepy.utils import crime_reports_to_polars
+from policedatauk.utils import pydantic_to_df
 
-df = crime_reports_to_polars(crimes)
-df.filter(df["category"] == "violent-crime").groupby("street_name").count()
+
+crimes_df = pydantic_to_df(crimes, rename_key="crime_reports")
+crimes_df.filter(
+    crimes_df["category"] == "violent-crime"
+).groupby("street_name").count()
 ```
-
-Support is included for:
-
-* `CrimeReport` → flat table
-* `CrimeWithOutcomes` → exploded table (crime × outcomes)
-* More coming soon
 
 ---
 
 ## 🌍 Geo support
 
-Optional extras enable polygon, WKT and GeoJSON utilities:
-
-```python
-from ukcrimepy.utils import boundary_to_geojson_and_wkt
-
-geojson, wkt = boundary_to_geojson_and_wkt(boundary_data, "neighbourhood-id")
-```
-
-Install with:
-
-```bash
-pip install ukcrimepy[geo]
-```
+COMING SOON - map integration to display crimes and locations
 
 ---
 
@@ -105,22 +91,23 @@ pip install ukcrimepy[geo]
 Clone the repo and install in editable mode:
 
 ```bash
-git clone https://github.com/yourusername/ukcrimepy.git
-cd ukcrimepy
+git clone https://github.com/daniel-j-whelan/policedatauk.git
+cd policedatauk
 pip install -e ".[dev,geo]"
 ```
 
 Run tests:
 
 ```bash
-pytest
+uv run pytest policedatauk\tests
 ```
 
 Lint and type check:
 
 ```bash
-ruff check .
-mypy .
+uv run ruff format
+uv run ruff check --fix
+
 ```
 
 ---
@@ -129,7 +116,7 @@ mypy .
 
 * [ ] Complete coverage of all Police API endpoints
 * [ ] Synchronous wrapper (for non-async users)
-* [ ] CLI tool for quick queries
+* [ ] Map integration for location & crime visualisation
 * [ ] Docs site (MkDocs or Sphinx)
 * [ ] More Polars utilities (e.g. pre-built visualisations)
 
@@ -150,4 +137,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## 📜 License
 
-This project is licensed under the MIT License – see [LICENSE](LICENSE) for details.
+This project is licensed under the GNU General Public License – see [LICENSE.md](LICENSE.md) for details.
