@@ -17,7 +17,7 @@ RENAME_MAP = {
         "crime_location_street_id": "street_id",
         "crime_location_street_name": "street_name",
         "outcomes_date": "outcome_date",
-        "outcomes_category_name": "outcome_category",
+        "outcomes_category_name": "outcome_name",
         "outcomes_category_code": "outcome_code",
     },
 }
@@ -26,6 +26,7 @@ RENAME_MAP = {
 def pydantic_to_df(
     models: BaseModel | List[BaseModel],
     sep: str = "_",
+    exclude_none: bool = True,
     explode: bool = True,
     rename: Optional[Dict[str, str]] = None,
     rename_key: Optional[str] = None,
@@ -39,6 +40,7 @@ def pydantic_to_df(
         models: Pydantic model/s.
         sep: Separator for flattened keys.
             Default is "_".
+        exclude_none: Exclude fields containing Nones in model results.
         explode: Whether to explode list-of-dicts columns into seperate rows.
             Default is True.
         rename: Optional dict mapping old column names to new names.
@@ -49,18 +51,20 @@ def pydantic_to_df(
         A Polars DataFrame.
     """
     if isinstance(models, BaseModel):
-        records = [models.model_dump(exclude_none=True, mode="json")]
+        records = [models.model_dump(exclude_none=exclude_none, mode="json")]
     else:
-        records = [model.model_dump(exclude_none=True, mode="json") for model in models]
+        records = [
+            model.model_dump(exclude_none=exclude_none, mode="json") for model in models
+        ]
     df = pl.json_normalize(records, separator=sep)
     if explode:
         for col in df.columns:
             if df.schema[col] == pl.List(pl.Struct):
                 df = df.explode(col).unnest(col)
     if rename_key:
-        df = df.rename(RENAME_MAP.get(rename_key, {}))
+        df = df.rename(RENAME_MAP.get(rename_key, {}), strict=False)
     elif rename:
-        df = df.rename(rename)
+        df = df.rename(rename, strict=False)
     return df
 
 
