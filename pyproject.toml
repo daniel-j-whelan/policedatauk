@@ -16,6 +16,11 @@ dependencies = [
     "pyproj>=3.7.1",
 ]
 
+[project.optional-dependencies]
+geo = [
+    "folium>=0.20.0",
+]
+
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
