@@ -1,6 +1,6 @@
 from httpx import AsyncClient, HTTPStatusError, Response
 from aiolimiter import AsyncLimiter
-from ..utils.retry import async_retry
+from ..utils import async_retry
 
 
 class BaseAPI:
