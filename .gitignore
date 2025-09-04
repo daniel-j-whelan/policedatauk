@@ -54,3 +54,4 @@ uv.lock
 *.local
 map.html
 policedatauk/tester.py
+*.ipynb
