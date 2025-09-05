@@ -6,7 +6,7 @@ import polars as pl
 from pydantic import BaseModel
 
 RENAME_MAP = {
-    "crime_reports": {
+    "crimes": {
         "location_latitude": "latitude",
         "location_longitude": "longitude",
         "location_street_id": "street_id",
@@ -14,7 +14,7 @@ RENAME_MAP = {
         "outcome_status_category": "outcome_category",
         "outcome_status_date": "outcome_date",
     },
-    "crimes_with_outcomes": {
+    "outcomes": {
         "crime_location_latitude": "latitude",
         "crime_location_longitude": "longitude",
         "crime_location_street_id": "street_id",

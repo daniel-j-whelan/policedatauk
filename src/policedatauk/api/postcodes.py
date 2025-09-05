@@ -17,6 +17,8 @@ class PostcodeAPI(BaseAPI):
 
         Args:
             postcode: The postcode to get information for.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             The detailed information of the postcode.
@@ -35,8 +37,10 @@ class PostcodeAPI(BaseAPI):
         data = response.json()
         if data["status"] != 200 or not data["result"]:
             raise ValueError(f"API error: {data.get('error', 'Unknown')}")
+
         if to_polars:
             return pydantic_to_df(PostCode(**data["result"]))
+
         return PostCode(**data["result"])
 
     async def get_postcode(
@@ -46,8 +50,9 @@ class PostcodeAPI(BaseAPI):
 
         Args:
             lat: The latitude.
-
             lon: The longitude.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             PostCode: The postcode.
@@ -62,10 +67,12 @@ class PostcodeAPI(BaseAPI):
         data = response.json()
         if data["status"] != 200 or not data["result"]:
             raise ValueError(f"API error: {data.get('error', 'Unknown')}")
+
         if to_polars:
             return pydantic_to_df(
                 [PostCode(**result) for result in data["result"]]
             )
+
         return [PostCode(**result) for result in data["result"]]
 
     async def is_valid_postcode(self, postcode: str) -> bool:

@@ -32,18 +32,16 @@ class CrimeAPI(BaseAPI):
         Args:
             lat: Latitude of the location.
                 Defaults to None.
-
             lon: Longitude of the location.
                 Defaults to None.
-
             radius: The radius (in meters) to buffer the location.
                 Defaults to None.
-
             poly: A polygon to filter crimes by.
                 Defaults to None.
-
             date: The date for which to retrieve crimes.
                 Defaults to None, which retrieves the latest month.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A list of crime reports for the specified location.
@@ -74,8 +72,10 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/crimes-street/all-crime", params=params
         )
         data = response.json()
+
         if to_polars:
             return pydantic_to_df([CrimeReport(**crime) for crime in data])
+
         return [CrimeReport(**crime) for crime in data]
 
     async def get_crimes_no_location(
@@ -89,12 +89,12 @@ class CrimeAPI(BaseAPI):
 
         Args:
             force: The police force to filter crimes by.
-
             category: The crime category to filter by.
                 Defaults to None, which retrieves all categories.
-
             date: The date for which to retrieve crimes.
                 Defaults to None, which retrieves all crimes.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A list of crime reports.
@@ -113,17 +113,23 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/crimes-no-location", params=params
         )
         data = response.json()
+
         if to_polars:
             return pydantic_to_df([CrimeReport(**crime) for crime in data])
+
         return [CrimeReport(**crime) for crime in data]
 
     async def get_crime_by_id(
-        self, crime_id: str, to_polars: bool = False
+        self,
+        crime_id: str,
+        to_polars: bool = False,
     ) -> CrimeReport:
         """Return a specific crime report by ID.
 
         Args:
             crime_id: The ID of the crime report.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A specific crime report.
@@ -132,14 +138,21 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/outcomes-for-crime/{crime_id}"
         )
         data = response.json()
+
         if to_polars:
             return pydantic_to_df(CrimeWithOutcomes(**data))
+
         return CrimeWithOutcomes(**data)
 
     async def get_crime_categories(
-        self, to_polars: bool = False
+        self,
+        to_polars: bool = False,
     ) -> List[CrimeCategory]:
         """Return a list of all crime categories.
+
+        Args:
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A list of all crime categories.
@@ -148,8 +161,10 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/crime-categories"
         )
         categories_data = response.json()
+
         if to_polars:
             return pydantic_to_df(
                 [CrimeCategory(**category) for category in categories_data]
             )
+
         return [CrimeCategory(**category) for category in categories_data]

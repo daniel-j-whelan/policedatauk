@@ -31,10 +31,8 @@ class BaseAPI:
 
         Args:
             url: URL of the request.
-
             params: The data to include in the POST request.
                 Defaults to None.
-
             json_mode: If True, send as JSON body (application/json).
                 If False, send as form-encoded
                     (application/x-www-form-urlencoded).
@@ -72,7 +70,6 @@ class BaseAPI:
 
         Args:
             url: URL of the request.
-
             params: The query parameters for the GET request.
                 Defaults to None.
 

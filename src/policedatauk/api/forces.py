@@ -14,15 +14,21 @@ class ForceAPI(BaseAPI):
     async def get_all_forces(self, to_polars: bool = False) -> List[Force]:
         """Return a list of all police forces (basic summary only).
 
+        Args:
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
+
         Returns:
             A list of all police forces (basic summary only).
         """
         response = await self._throttle_get_request(f"{self.base_url}/forces")
         forces_data = response.json()
+
         if to_polars:
             return pydantic_to_df(
                 [ForceSummary(**force) for force in forces_data]
             )
+
         return [ForceSummary(**force) for force in forces_data]
 
     async def get_force(self, force_id: str, to_polars: bool = False) -> Force:
@@ -30,6 +36,8 @@ class ForceAPI(BaseAPI):
 
         Args:
             force_id: The ID of the police force.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A specific police force.
@@ -38,8 +46,10 @@ class ForceAPI(BaseAPI):
             f"{self.base_url}/forces/{force_id}"
         )
         force_data = response.json()
+
         if to_polars:
             return pydantic_to_df(Force(**force_data))
+
         return Force(**force_data)
 
     async def get_specific_forces(
@@ -49,6 +59,8 @@ class ForceAPI(BaseAPI):
 
         Args:
             force_ids: A list of police force IDs.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A list of police forces.
@@ -56,10 +68,12 @@ class ForceAPI(BaseAPI):
         tasks = [self.get_force(force_id) for force_id in force_ids]
         forces = await asyncio.gather(*tasks, return_exceptions=True)
         # Need to add logging here to explain when tasks fail?
+
         if to_polars:
             return pydantic_to_df(
                 [force for force in forces if not isinstance(force, Exception)]
             )
+
         return [force for force in forces if not isinstance(force, Exception)]
 
     async def get_people(
@@ -69,6 +83,8 @@ class ForceAPI(BaseAPI):
 
         Args:
             force_id: The ID of the police force.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A list of people (officers) in a specific police force.
@@ -77,6 +93,8 @@ class ForceAPI(BaseAPI):
             f"{self.base_url}/forces/{force_id}/people"
         )
         people_data = response.json()
+
         if to_polars:
             return pydantic_to_df([Person(**person) for person in people_data])
+
         return [Person(**person) for person in people_data]

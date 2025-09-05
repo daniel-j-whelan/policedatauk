@@ -26,6 +26,8 @@ class NeighbourhoodAPI(BaseAPI):
         """Return a list of all neighbourhoods (basic summary only).
         Args:
             force: The ID of the police force.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A list of all neighbourhoods for a force (basic summary only).
@@ -34,6 +36,7 @@ class NeighbourhoodAPI(BaseAPI):
             f"{self.base_url}/{force}/neighbourhoods"
         )
         neighbourhoods_data = response.json()
+
         if to_polars:
             return pydantic_to_df(
                 [
@@ -41,6 +44,7 @@ class NeighbourhoodAPI(BaseAPI):
                     for neighbourhood in neighbourhoods_data
                 ]
             )
+
         return [
             NeighbourhoodSummary(**neighbourhood)
             for neighbourhood in neighbourhoods_data
@@ -57,6 +61,8 @@ class NeighbourhoodAPI(BaseAPI):
         Args:
             force: The ID of the police force.
             neighbourhood_id: The ID of the neighbourhood.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A specific neighbourhood.
@@ -65,8 +71,10 @@ class NeighbourhoodAPI(BaseAPI):
             f"{self.base_url}/{force}/{neighbourhood_id}"
         )
         neighbourhood_data = response.json()
+
         if to_polars:
             return pydantic_to_df(Neighbourhood(**neighbourhood_data))
+
         return Neighbourhood(**neighbourhood_data)
 
     async def get_boundary(
@@ -120,6 +128,8 @@ class NeighbourhoodAPI(BaseAPI):
         Args:
             lat: The latitude of the location.
             lon: The longitude of the location.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             The neighbourhood for the specific latitude and longitude.
@@ -131,8 +141,10 @@ class NeighbourhoodAPI(BaseAPI):
             params={"q": f"{lat},{lon}"},
         )
         neighbourhood_data = response.json()
+
         if to_polars:
             return pydantic_to_df(NeighbourhoodResult(**neighbourhood_data))
+
         return NeighbourhoodResult(**neighbourhood_data)
 
     async def get_people(
@@ -146,6 +158,8 @@ class NeighbourhoodAPI(BaseAPI):
         Args:
             force_id: The ID of the police force.
             neighbourhood_id: The ID of the neighbourhood.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
 
         Returns:
             A list of people (officers) in a specific neighbourhood.
@@ -154,6 +168,8 @@ class NeighbourhoodAPI(BaseAPI):
             f"{self.base_url}/{force_id}/{neighbourhood_id}/people"
         )
         people_data = response.json()
+
         if to_polars:
             return pydantic_to_df([Person(**person) for person in people_data])
+
         return [Person(**person) for person in people_data]
