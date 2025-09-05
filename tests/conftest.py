@@ -16,15 +16,17 @@ def api_client() -> Generator[PoliceClient, None, None]:
     client.limiter = AsyncLimiter(1, 1.0)  # Set a low rate limit for testing
     yield client
 
+
 @pytest.fixture(autouse=True)
-def fast_retries(monkeypatch):
+def fast_retries(monkeypatch: pytest.MonkeyPatch) -> None:
     """Make tenacity retries run instantly during tests (no sleep/wait)."""
 
-    async def instant_sleep(_delay, *args, **kwargs):
+    async def instant_sleep(_delay: float) -> None:
         return None
 
-    # Patch asyncio.sleep everywhere
+    # Patch asyncio.sleep everywhere when testing
     monkeypatch.setattr("asyncio.sleep", instant_sleep)
+
 
 @pytest.fixture
 def police_mock_respx(
