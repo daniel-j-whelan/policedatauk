@@ -35,47 +35,145 @@ pip install git+https://github.com/daniel-j-whelan/policedatauk.git
 
 ---
 
-## 🚀 Quick start
+## 🚀 Examples
+
+All `policedatauk` calls are **asynchronous**.  
+- If you are running code in a **script or terminal**, wrap examples in `asyncio.run(...)`.  
+- If you are running inside a **Jupyter notebook**, call the methods with `await` instead (since a loop is already running).
+
+### Get Police Forces
 
 ```python
 import asyncio
 from policedatauk import PoliceClient
 
-
 client = PoliceClient()
 
-# Get all forcess
-forces = await client.forces.get_all_forces()
-print(forces[0])
+async def main():
+    # List all police forces
+    forces = await client.forces.get_all_forces()
+    print(forces[:5])
+    # Force(id='avon-and-somerset', name='Avon and Somerset Constabulary')
 
-# Crimes in the Avon and Somerset Constabulary (January 2024)
-crimes = await client.crimes.get_crimes_no_location(
-    date="2024-01",
-    force=forces[0].id,
-)
-print(crimes[:2])
-
-# 
-crimes_df = pydantic_to_df(crimes, "crime_reports")
+asyncio.run(main())
 ```
 
----
-
-## 📊 DataFrame integration
-
-All Pydantic models can be normalised into Polars for analysis:
+### Crimes by Force
 
 ```python
-from policedatauk.utils import pydantic_to_df
+async def main():
+    # Crimes in Avon & Somerset (January 2024)
+    crimes = await client.crimes.get_crimes_no_location(
+        date="2024-01",
+        force="avon-and-somerset",
+    )
+    print(crimes[:5])
+    # [CrimeReport(id='...', category='violent-crime', ...), ...]
 
-
-crimes_df = pydantic_to_df(crimes, rename_key="crime_reports")
-crimes_df.filter(
-    crimes_df["category"] == "violent-crime"
-).groupby("street_name").count()
+asyncio.run(main())
 ```
 
+### Results as a Polars DataFrame (to_polars)
+
+```python
+async def main():
+    crimes_df = await client.crimes.get_crimes_no_location(
+        date="2024-01",
+        force="cambridgeshire",
+        to_polars=True,
+    )
+    print(crimes_df.head(3))
+
+asyncio.run(main())
+```
+
+### Get a Specific Crime by ID
+
+```python
+async def main():
+    crime_df = await client.crimes.get_crime_by_id(
+        "51e9616788041dfeeacb3c11ec40b9296c32213736f0ad16104173568f0dd4ce",
+        to_polars=True
+    )
+    print(crime_df)
+
+asyncio.run(main())
+```
+
+### Locate your Neighbourhood
+
+```python
+async def main():
+    # Locate neighbourhood by coordinates
+    neighbourhood_df = await client.neighbourhoods.locate_neighbourhood(
+        lat=53.2286,
+        lon=-0.5478,
+        to_polars=True
+    )
+    print(neighbourhood_df)
+
+    # Get neighbourhood boundaries (GeoJSON + shapely Polygon)
+    geojson, poly = await client.neighbourhoods.get_boundary(
+        force="lincolnshire",
+        neighbourhood_id="NC14",
+    )
+    print(poly)
+
+asyncio.run(main())
+```
+
+### Crimes Within a Polygon (e.g. a Neighbourhood boundary)
+
+```python
+async def main():
+    # Get neighbourhood boundary polygon
+    _, poly = await client.neighbourhoods.get_boundary(
+        force="lincolnshire",
+        neighbourhood_id="NC14",
+    )
+
+    # Crimes inside polygon
+    crimes_in_poly_df = await client.crimes.get_crimes_by_location(
+        date="2024-01",
+        poly=poly,
+        to_polars=True
+    )
+    print(crimes_in_poly_df.head())
+
+    # Example: filter and group
+    shoplifting = (
+        crimes_in_poly_df
+        .filter(crimes_in_poly_df["crime_code"] == "shoplifting")
+        .group_by("outcome_code")
+        .len()
+        .sort("len", descending=True)
+    )
+    print(shoplifting)
+
+asyncio.run(main())
+```
+
+### Crime Categories
+
+```python
+async def main():
+    categories_df = await client.crimes.get_crime_categories(to_polars=True)
+    print(categories_df)
+
+asyncio.run(main())
+```
+
+### Notes
+- In Jupyter notebooks, drop the asyncio.run(main()) wrapper and just use await directly:
+
+```python
+forces = await client.forces.get_all_forces()
+forces[:3]
+```
+
+- All DataFrame examples use Polars. If to_polars=True is passed, results are returned as pl.DataFrame objects, otherwise they are returned as Pydantic models.
 ---
+
 
 ## 🌍 Geo support
 
