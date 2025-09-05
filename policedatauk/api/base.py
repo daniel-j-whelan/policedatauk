@@ -1,12 +1,15 @@
-from httpx import AsyncClient, HTTPStatusError, Response
 from aiolimiter import AsyncLimiter
+from httpx import AsyncClient, HTTPStatusError, Response
+
 from ..utils import async_retry
 
 
 class BaseAPI:
     """Base class for API interactions with rate limiting and retry logic."""
 
-    def __init__(self, client: AsyncClient, limiter: AsyncLimiter, base_url: str):
+    def __init__(
+        self, client: AsyncClient, limiter: AsyncLimiter, base_url: str
+    ):
         self.client = client
         self.limiter = limiter
         self.base_url = base_url

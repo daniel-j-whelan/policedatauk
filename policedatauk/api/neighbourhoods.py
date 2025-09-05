@@ -1,16 +1,24 @@
-from .base import BaseAPI
+import json
 from typing import List
+
 from shapely.geometry import Polygon, mapping
 
-from ..models import Person, Neighbourhood, NeighbourhoodSummary, NeighbourhoodResult
+from ..models import (
+    Neighbourhood,
+    NeighbourhoodResult,
+    NeighbourhoodSummary,
+    Person,
+)
 from ..utils import validate_lat, validate_lon
-import json
+from .base import BaseAPI
 
 
 class NeighbourhoodAPI(BaseAPI):
     """Neighbourhood-related API methods for the UK Police API."""
 
-    async def get_all_neighbourhoods(self, force: str) -> List[NeighbourhoodSummary]:
+    async def get_all_neighbourhoods(
+        self, force: str
+    ) -> List[NeighbourhoodSummary]:
         """Return a list of all neighbourhoods (basic summary only).
         Args:
             force: The ID of the police force.
@@ -45,7 +53,9 @@ class NeighbourhoodAPI(BaseAPI):
         neighbourhood_data = response.json()
         return Neighbourhood(**neighbourhood_data)
 
-    async def get_boundary(self, force: str, neighbourhood_id: str) -> Neighbourhood:
+    async def get_boundary(
+        self, force: str, neighbourhood_id: str
+    ) -> Neighbourhood:
         """Return the boundary of a specific neighbourhood by ID.
 
         Args:
@@ -84,7 +94,9 @@ class NeighbourhoodAPI(BaseAPI):
 
         return geojson_str, polygon
 
-    async def locate_neighbourhood(self, lat: float, lon: float) -> Neighbourhood:
+    async def locate_neighbourhood(
+        self, lat: float, lon: float
+    ) -> Neighbourhood:
         """Return the neighbourhood for a specific latitude and longitude.
 
         Args:
@@ -97,12 +109,15 @@ class NeighbourhoodAPI(BaseAPI):
         validate_lat(lat)
         validate_lon(lon)
         response = await self._throttle_get_request(
-            f"{self.base_url}/locate-neighbourhood", params={"q": f"{lat},{lon}"}
+            f"{self.base_url}/locate-neighbourhood",
+            params={"q": f"{lat},{lon}"},
         )
         neighbourhood_data = response.json()
         return NeighbourhoodResult(**neighbourhood_data)
 
-    async def get_people(self, force_id: str, neighbourhood_id: str) -> List[Person]:
+    async def get_people(
+        self, force_id: str, neighbourhood_id: str
+    ) -> List[Person]:
         """Return a list of people (officers) in a specific police force.
 
         Args:

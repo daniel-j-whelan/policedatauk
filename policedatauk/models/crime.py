@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
-from .location import StreetLocation
 from typing import Dict, List, Optional
+
+from pydantic import BaseModel, Field
+
+from .location import StreetLocation
 
 
 class CrimeCategory(BaseModel):

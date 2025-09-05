@@ -1,10 +1,10 @@
+from httpx import HTTPStatusError, TimeoutException
 from tenacity import (
     retry,
     retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
 )
-from httpx import HTTPStatusError, TimeoutException
 
 
 def async_retry(max_attempts=5, base_wait=1, max_wait=4):

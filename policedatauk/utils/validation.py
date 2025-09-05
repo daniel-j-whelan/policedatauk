@@ -18,7 +18,9 @@ def validate_lat(lat: float) -> None:
     try:
         float(lat)
     except ValueError:
-        raise TypeError("'lat' must be a float or a string representation of a float.")
+        raise TypeError(
+            "'lat' must be a float or a string representation of a float."
+        )
     if lat < -90 or lat > 90:
         raise ValueError("Latitude must be between -90 and 90 degrees.")
         # return False
@@ -41,7 +43,9 @@ def validate_lon(lon: float) -> None:
     try:
         float(lon)
     except ValueError:
-        raise TypeError("'lon' must be a float or a string representation of a float.")
+        raise TypeError(
+            "'lon' must be a float or a string representation of a float."
+        )
     if lon < -180 or lon > 180:
         raise ValueError("Longitude must be between -180 and 180 degrees.")
         # return False

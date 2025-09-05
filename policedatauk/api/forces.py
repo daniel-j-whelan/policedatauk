@@ -1,8 +1,8 @@
 import asyncio
 from typing import List
 
-from .base import BaseAPI
 from ..models import Force, ForceSummary, Person
+from .base import BaseAPI
 
 
 class ForceAPI(BaseAPI):

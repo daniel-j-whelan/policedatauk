@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class NeighbourhoodLinks(BaseModel):
@@ -94,13 +95,19 @@ class NeighbourhoodLocation(BaseModel):
     """
 
     name: str | None = Field(None, description="Name of the location.")
-    longitude: str | None = Field(None, description="Longitude of the location.")
+    longitude: str | None = Field(
+        None, description="Longitude of the location."
+    )
     latitude: str | None = Field(None, description="Latitude of the location.")
     postcode: str | None = Field(None, description="Postcode of the location.")
     address: str | None = Field(None, description="Address of the location.")
-    telephone: str | None = Field(None, description="Telephone number of the location.")
+    telephone: str | None = Field(
+        None, description="Telephone number of the location."
+    )
     type: str = Field(..., description="Type of location, e.g. 'station'.")
-    description: str | None = Field(None, description="Description of the location.")
+    description: str | None = Field(
+        None, description="Description of the location."
+    )
 
 
 class Neighbourhood(BaseModel):
@@ -132,22 +139,30 @@ class Neighbourhood(BaseModel):
     """
 
     contact_details: dict = Field(
-        default_factory=dict, description="Contact information for the neighbourhood."
+        default_factory=dict,
+        description="Contact information for the neighbourhood.",
     )
     name: str = Field(..., description="Name of the neighbourhood.")
     description: str | None = Field(
         None, description="Description of the neighbourhood."
     )
-    links: list[NeighbourhoodLinks] = Field(..., description="List of follow-on links.")
+    links: list[NeighbourhoodLinks] = Field(
+        ..., description="List of follow-on links."
+    )
     id: str = Field(..., description="ID of the neighbourhood.")
     centre: dict = Field(
-        ..., description="Latitude and longitude of the neighbourhood's centre point."
+        ...,
+        description="Latitude and longitude of the neighbourhood's centre point.",
     )
     locations: list[NeighbourhoodLocation] = Field(
         ..., description="List of locations within the neighbourhood."
     )
-    url_force: str = Field(..., description="URL of the neighbourhood's website.")
-    population: str = Field(..., description="Population of the neighbourhood.")
+    url_force: str = Field(
+        ..., description="URL of the neighbourhood's website."
+    )
+    population: str = Field(
+        ..., description="Population of the neighbourhood."
+    )
 
 
 class Person(BaseModel):

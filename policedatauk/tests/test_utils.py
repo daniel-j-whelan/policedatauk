@@ -1,7 +1,13 @@
-import pytest
 import httpx
-from policedatauk.utils import buffer_point, parse_polygon, validate_lat, validate_lon
+import pytest
 from shapely.errors import GEOSException
+
+from policedatauk.utils import (
+    buffer_point,
+    parse_polygon,
+    validate_lat,
+    validate_lon,
+)
 
 
 def test_validate_coordinates():

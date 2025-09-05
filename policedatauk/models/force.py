@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class EngagementMethod(BaseModel):
@@ -97,7 +98,9 @@ class Force(BaseModel):
     engagement_methods: list[EngagementMethod] = Field(
         ..., description="List of engagement methods."
     )
-    telephone: str = Field(..., description="Telephone number of the police force.")
+    telephone: str = Field(
+        ..., description="Telephone number of the police force."
+    )
     id: str = Field(..., description="ID of the police force.")
     name: str = Field(..., description="Name of the police force.")
 

@@ -1,7 +1,8 @@
 import re
-from shapely.geometry import Polygon
-from shapely import wkt
 from typing import Tuple
+
+from shapely import wkt
+from shapely.geometry import Polygon
 
 LAT_LON_REGEX = re.compile(
     r"""
@@ -10,6 +11,13 @@ LAT_LON_REGEX = re.compile(
         \s*[, ]\s*              # separator: comma, space, or both
         (-?\d+(?:\.\d+)?)       # longitude: group 2
         \s*$                    # optional trailing whitespace
+    """,
+    re.VERBOSE,
+)
+
+API_POLYGON_REGEX = re.compile(
+    r"""
+        ^(\d+\.\d+,\d+\.\d+(?:\:|$))+$
     """,
     re.VERBOSE,
 )
@@ -60,6 +68,9 @@ def parse_polygon(polygon: str | Polygon) -> str:
             f"{lat},{lon}" for lon, lat in polygon.exterior.coords[:-1]
         )
     elif isinstance(polygon, str):
+        match = API_POLYGON_REGEX.match(polygon.strip())
+        if match:
+            return polygon
         polygon_obj = wkt.loads(polygon)
         if not polygon_obj.is_valid:
             raise ValueError("Invalid polygon provided.")

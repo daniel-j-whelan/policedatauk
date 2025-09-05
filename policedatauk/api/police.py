@@ -1,6 +1,8 @@
+from functools import cached_property
+
 import httpx
 from aiolimiter import AsyncLimiter
-from functools import cached_property
+
 from .crimes import CrimeAPI
 from .forces import ForceAPI
 from .neighbourhoods import NeighbourhoodAPI
@@ -20,7 +22,9 @@ class PoliceClient:
         self.neighbourhoods = NeighbourhoodAPI(
             self.client, self.limiter, self.police_url
         )
-        self.postcodes = PostcodeAPI(self.client, self.limiter, self.postcode_url)
+        self.postcodes = PostcodeAPI(
+            self.client, self.limiter, self.postcode_url
+        )
 
     @cached_property
     def last_updated(self) -> str:

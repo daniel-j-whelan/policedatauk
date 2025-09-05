@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from typing import Dict
+
+from pydantic import BaseModel, Field
 
 
 class PostCode(BaseModel):
@@ -63,7 +64,9 @@ class PostCode(BaseModel):
     """
 
     postcode: str = Field(..., description="Postcode.", examples=["HX6 4JT"])
-    quality: int = Field(..., description="Quality of the postcode.", examples=[1])
+    quality: int = Field(
+        ..., description="Quality of the postcode.", examples=[1]
+    )
     eastings: int = Field(
         ...,
         description="Eastings of the postcode.",
@@ -118,8 +121,12 @@ class PostCode(BaseModel):
         description="Middle Layer Super Output Area of the postcode.",
         examples=["Calderdale 027"],
     )
-    incode: str = Field(..., description="Incode of the postcode.", examples=["4JT"])
-    outcode: str = Field(..., description="Outcode of the postcode.", examples=["HX6"])
+    incode: str = Field(
+        ..., description="Incode of the postcode.", examples=["4JT"]
+    )
+    outcode: str = Field(
+        ..., description="Outcode of the postcode.", examples=["HX6"]
+    )
     parliamentary_constituency: str = Field(
         ...,
         description="Parliamentary constituency of the postcode.",

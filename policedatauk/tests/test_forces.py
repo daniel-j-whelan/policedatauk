@@ -6,7 +6,10 @@ async def test_get_all_forces(api_client, mock_respx):
     mock_route = mock_respx.get("/forces").respond(
         200,
         json=[
-            {"id": "avon-and-somerset", "name": "Avon and Somerset Constabulary"},
+            {
+                "id": "avon-and-somerset",
+                "name": "Avon and Somerset Constabulary",
+            },
             {"id": "bedfordshire", "name": "Bedfordshire Police"},
         ],
     )

@@ -1,11 +1,15 @@
+import json
+
+import pyproj
 from shapely.geometry import Point, mapping
 from shapely.ops import transform
+
 from .validation import validate_lat, validate_lon
-import json
-import pyproj
 
 
-def buffer_point(lat: float, lon: float, radius_m: float, output: str = "wkt") -> str:
+def buffer_point(
+    lat: float, lon: float, radius_m: float, output: str = "wkt"
+) -> str:
     """
     Buffer a WGS84 point by a radius in metres and return WKT polygon.
 

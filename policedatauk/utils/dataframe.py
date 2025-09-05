@@ -1,6 +1,7 @@
+from typing import Dict, List, Optional
+
 import polars as pl
 from pydantic import BaseModel
-from typing import List, Dict, Optional
 
 RENAME_MAP = {
     "crime_reports": {
@@ -54,7 +55,8 @@ def pydantic_to_df(
         records = [models.model_dump(exclude_none=exclude_none, mode="json")]
     else:
         records = [
-            model.model_dump(exclude_none=exclude_none, mode="json") for model in models
+            model.model_dump(exclude_none=exclude_none, mode="json")
+            for model in models
         ]
     df = pl.json_normalize(records, separator=sep)
     if explode:
@@ -65,49 +67,75 @@ def pydantic_to_df(
         df = df.rename(RENAME_MAP.get(rename_key, {}), strict=False)
     elif rename:
         df = df.rename(rename, strict=False)
+
+    df = clean_polars_df(df)
     return df
 
 
 def handle_empty_strings(df: pl.DataFrame) -> pl.DataFrame:
-    """Handle empty strings in a Polars DataFrame.
+    """Replace empty or whitespace-only strings in string columns with None.
+
+    For each string column:
+    - Strip leading/trailing whitespace.
+    - If the stripped value is empty, replace with None.
+    - Otherwise, keep the stripped value.
 
     Args:
-        df (pl.DataFrame): The input DataFrame.
+        df: Polars DataFrame to clean.
 
     Returns:
-        DataFrame with empty strings handled.
+        Cleaned DataFrame with empty/whitespace strings replaced by None.
     """
-    return df.with_columns(
+    string_columns = [
+        column for column, dtype in df.schema.items() if dtype == pl.Utf8
+    ]
+
+    if not string_columns:
+        return df
+
+    df = df.with_columns(
         [
-            pl.col(col).str.strip_chars().replace("", None)
-            for col, dtype in df.schema.items()
-            if dtype == pl.String
+            pl.when(pl.col(column).str.strip_chars().str.len_chars() == 0)
+            .then(None)
+            .otherwise(pl.col(column).str.strip_chars())
+            .alias(column)
+            for column in string_columns
         ]
     )
 
+    return df
+
 
 def drop_empty_columns(df: pl.DataFrame) -> pl.DataFrame:
-    """Drop fully empty columns from a Polars DataFrame.
+    """Drop columns that are entirely null or empty after cleaning.
 
     Args:
-        df (pl.DataFrame): The input DataFrame.
+        df: Polars DataFrame.
 
     Returns:
-        DataFrame with fully empty columns dropped.
+        DataFrame without all-null columns.
     """
-    return df.drop(pl.all().is_empty())
+    keep_cols = []
+    for c in df.columns:
+        all_null = df.select(pl.col(c).is_null().all()).to_series()[0]
+        if not all_null:
+            keep_cols.append(c)
+    return df.select(keep_cols)
 
 
 def drop_empty_rows(df: pl.DataFrame) -> pl.DataFrame:
-    """Drop fully null rows from a Polars DataFrame.
+    """Drop rows that are entirely null across all columns.
 
     Args:
-        df (pl.DataFrame): The input DataFrame.
+        df: Polars DataFrame.
 
     Returns:
-        DataFrame with fully null rows dropped.
+        DataFrame without all-null rows.
     """
-    return df.drop_nulls(how="all")
+    not_null_exprs = [pl.col(column).is_not_null() for column in df.columns]
+    any_not_null = pl.any_horizontal(not_null_exprs)
+
+    return df.filter(any_not_null)
 
 
 def parse_datetime_columns(df: pl.DataFrame) -> pl.DataFrame:
