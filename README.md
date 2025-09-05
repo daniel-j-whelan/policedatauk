@@ -2,9 +2,11 @@
 
 > A modern, async-first Python client for the [UK Police Data API](https://data.police.uk/), with Pydantic models and Polars integration.
 
-[![CI](https://github.com/daniel-j-whelan/policedatauk/actions/workflows/ci.yml/badge.svg)](https://github.com/daniel-j-whelan/policedatauk/actions/workflows/ci.yml)
-[![PyPI version](https://badge.fury.io/py/policedatauk.svg)](https://pypi.org/project/policedatauk/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/daniel-j-whelan/policedatauk/actions/workflows/ci.yml/badge.svg)](https://github.com/daniel-j-whelan/policedatauk/actions)
+[![ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+<!-- [![PyPI version](https://badge.fury.io/py/policedatauk.svg)](https://pypi.org/project/policedatauk/) -->
+[![License: GPL](https://img.shields.io/badge/License-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 ---
 
