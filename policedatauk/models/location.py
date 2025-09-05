@@ -1,3 +1,5 @@
+"""Force-related pydantic models."""
+
 from typing import Dict
 
 from pydantic import BaseModel

@@ -1,3 +1,5 @@
+"""Initialisation file for the api submodule."""
+
 from .base import BaseAPI
 from .crimes import CrimeAPI
 from .forces import ForceAPI

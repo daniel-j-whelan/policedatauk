@@ -1,12 +1,24 @@
+"""Tests for crimes-related functionality."""
+
 import polars as pl
 import pytest
+from respx import Mock
 
+from policedatauk import PoliceClient
 from policedatauk.utils.dataframe import pydantic_to_df
 
 
 @pytest.mark.asyncio
-async def test_crimes_no_location(api_client, mock_respx):
-    mock_route = mock_respx.post("/crimes-no-location").respond(
+async def test_crimes_no_location(
+    api_client: PoliceClient, police_mock_respx: Mock
+) -> None:
+    """Tests get_crimes_no_location returns the expected result.
+
+    Args:
+        api_client (PoliceClient): The PoliceClient instance.
+        mock_respx (Mock): The respx mock.
+    """
+    mock_route = police_mock_respx.post("/crimes-no-location").respond(
         200,
         json=[
             {
@@ -15,10 +27,14 @@ async def test_crimes_no_location(api_client, mock_respx):
                 "location": None,
                 "context": "",
                 "outcome_status": {
-                    "category": "Investigation complete; no suspect identified",
+                    "category": (
+                        "Investigation complete; no suspect identified",
+                    ),
                     "date": "2024-01",
                 },
-                "persistent_id": "5fff4afc6584ac56744081c3eb0be8d1fce093acee4d2d754e60944f1d5bd43d",
+                "persistent_id": (
+                    "5fff4afc6584ac56744081c3eb0be8d1fce093acee4d2d754e60944f1d5bd43d",
+                ),
                 "id": 116072527,
                 "location_subtype": "",
                 "month": "2024-01",
@@ -29,10 +45,14 @@ async def test_crimes_no_location(api_client, mock_respx):
                 "location": None,
                 "context": "",
                 "outcome_status": {
-                    "category": "Investigation complete; no suspect identified",
+                    "category": (
+                        "Investigation complete; no suspect identified",
+                    ),
                     "date": "2024-01",
                 },
-                "persistent_id": "1b793a5cb34177d9dc9cc693ec026d04d8fe0910f31f7c062f3ea17c7f3057c5",
+                "persistent_id": (
+                    "1b793a5cb34177d9dc9cc693ec026d04d8fe0910f31f7c062f3ea17c7f3057c5",
+                ),
                 "id": 116072457,
                 "location_subtype": "",
                 "month": "2024-01",
@@ -53,8 +73,16 @@ async def test_crimes_no_location(api_client, mock_respx):
     assert mock_route.called
 
 
-async def test_crimes_by_location(api_client, mock_respx):
-    mock_route = mock_respx.post("/crimes-street/all-crime").respond(
+async def test_crimes_by_location(
+    api_client: PoliceClient, police_mock_respx: Mock
+) -> None:
+    """Tests get_crimes_by_location returns the expected result.
+
+    Args:
+        api_client (PoliceClient): The PoliceClient instance.
+        mock_respx (Mock): The respx mock.
+    """
+    mock_route = police_mock_respx.post("/crimes-street/all-crime").respond(
         200,
         json=[
             {
@@ -109,6 +137,7 @@ async def test_crimes_by_location(api_client, mock_respx):
     assert mock_route.called
 
 
-async def test_no_geo_params(api_client):
+async def test_no_geo_params(api_client: PoliceClient) -> None:
+    """Tests get_crimes_by_location fails when no geo params provided."""
     with pytest.raises(ValueError):
         await api_client.crimes.get_crimes_by_location()

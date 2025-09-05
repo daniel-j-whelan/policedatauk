@@ -1,3 +1,5 @@
+"""Crime-related pydantic models."""
+
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
@@ -45,9 +47,11 @@ class CrimeReport(BaseModel):
 
         month (str): Month of the crime report.
 
-        outcome_status (CrimeStatus | None, optional): Outcome status of the crime report.
+        outcome_status (CrimeStatus | None, optional): Outcome status of
+            the crime report.
 
-        persistent_id (str | None, optional): Persistent ID of the crime report.
+        persistent_id (str | None, optional): Persistent ID of the crime
+            report.
     """
 
     category: str
@@ -98,5 +102,13 @@ class CrimeOutcome(BaseModel):
 
 
 class CrimeWithOutcomes(BaseModel):
+    """Represents a crime report with its associated outcomes.
+
+    Args:
+        crime (CrimeReport): Crime report.
+        outcomes (List[CrimeOutcome]): List of crime outcomes.
+
+    """
+
     crime: CrimeReport
     outcomes: List[CrimeOutcome]

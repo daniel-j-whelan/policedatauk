@@ -1,9 +1,22 @@
+"""Tests for forces-related functionality."""
+
 import pytest
+from respx import Mock
+
+from policedatauk import PoliceClient
 
 
 @pytest.mark.asyncio
-async def test_get_all_forces(api_client, mock_respx):
-    mock_route = mock_respx.get("/forces").respond(
+async def test_get_all_forces(
+    api_client: PoliceClient, police_mock_respx: Mock
+) -> None:
+    """Tests that the get_all_forces method returns the expected result.
+
+    Args:
+        api_client (PoliceClient): The PoliceClient instance.
+        mock_respx (Mock): The respx mock.
+    """
+    mock_route = police_mock_respx.get("/forces").respond(
         200,
         json=[
             {

@@ -1,3 +1,5 @@
+"""Forces module for the policedatauk package."""
+
 import asyncio
 from typing import List
 

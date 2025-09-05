@@ -1,3 +1,5 @@
+"""Utilities for working with Polars DataFrames."""
+
 from typing import Dict, List, Optional
 
 import polars as pl

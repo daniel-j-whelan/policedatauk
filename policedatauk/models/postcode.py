@@ -1,3 +1,5 @@
+"""Postcode-related pydantic models."""
+
 from typing import Dict
 
 from pydantic import BaseModel, Field
@@ -23,7 +25,8 @@ class PostCode(BaseModel):
 
         latitude (float): The latitude of the postcode.
 
-        european_electoral_region (str): The European electoral region of the postcode.
+        european_electoral_region (str): The European electoral region
+            of the postcode.
 
         primary_care_trust (str): The primary care trust of the postcode.
 
@@ -37,7 +40,8 @@ class PostCode(BaseModel):
 
         outcode (str): The outcode of the postcode.
 
-        parliamentary_constituency (str): The parliamentary constituency of the postcode.
+        parliamentary_constituency (str): The parliamentary constituency
+            of the postcode.
 
         admin_district (str): The administrative district of the postcode.
 
@@ -53,7 +57,8 @@ class PostCode(BaseModel):
 
         ccg (str): The Clinical Commissioning Group of the postcode.
 
-        nuts (str): The Nomenclature of Territorial Units for Statistics of the postcode.
+        nuts (str): The Nomenclature of Territorial Units for Statistics
+            of the postcode.
 
         pfa (str): The Police and Fire Authority of the postcode.
 
@@ -169,7 +174,9 @@ class PostCode(BaseModel):
     )
     nuts: str = Field(
         ...,
-        description="Nomenclature of Territorial Units for Statistics of the postcode.",
+        description=(
+            "Nomenclature Territorial Units for Statistics of the postcode.",
+        ),
         examples=["Calderdale"],
     )
     pfa: str = Field(

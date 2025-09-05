@@ -1,3 +1,5 @@
+"""Crimes module for the policedatauk package."""
+
 from typing import List
 
 from ..models import CrimeCategory, CrimeReport, CrimeWithOutcomes
@@ -32,7 +34,7 @@ class CrimeAPI(BaseAPI):
             lon: Longitude of the location.
                 Defaults to None.
 
-            radius: The radius (in meters) to search for crimes around the location.
+            radius: The radius (in meters) to buffer the location.
                 Defaults to None.
 
             poly: A polygon to filter crimes by.

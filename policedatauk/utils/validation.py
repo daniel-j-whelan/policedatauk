@@ -1,3 +1,5 @@
+"""Utilities for validating input data."""
+
 import re
 from datetime import datetime
 
@@ -12,18 +14,15 @@ def validate_lat(lat: float) -> None:
         True if the latitude is valid.
 
     Raises:
-        TypeError if the latitude is not a float or string representation of a float.
-        ValueError if the latitude is not between -90 and 90 degrees.
+        TypeError if latitude not a float or string of a float.
+        ValueError if latitude not between -90 and 90 degrees.
     """
     try:
         float(lat)
     except ValueError:
-        raise TypeError(
-            "'lat' must be a float or a string representation of a float."
-        )
+        raise TypeError("'lat' must be a float or a string of a float.")
     if lat < -90 or lat > 90:
         raise ValueError("Latitude must be between -90 and 90 degrees.")
-        # return False
     return True
 
 
@@ -37,8 +36,8 @@ def validate_lon(lon: float) -> None:
         True if the longitude is valid.
 
     Raises:
-        TypeError if the longitude is not a float or string representation of a float.
-        ValueError if the longitude is not between -180 and 180 degrees.
+        TypeError if longitude not a float or string of a float.
+        ValueError if longitude not between -180 and 180 degrees.
     """
     try:
         float(lon)
@@ -48,7 +47,6 @@ def validate_lon(lon: float) -> None:
         )
     if lon < -180 or lon > 180:
         raise ValueError("Longitude must be between -180 and 180 degrees.")
-        # return False
     return True
 
 

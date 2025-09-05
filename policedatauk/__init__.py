@@ -1,3 +1,5 @@
+"""Initialisation file for the policedatauk package."""
+
 from policedatauk.api.crimes import CrimeAPI
 from policedatauk.api.forces import ForceAPI
 from policedatauk.api.police import PoliceClient

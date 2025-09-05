@@ -1,3 +1,5 @@
+"""Postcode module for the policedatauk package."""
+
 from httpx import HTTPStatusError
 
 from ..models import PostCode
@@ -20,13 +22,12 @@ class PostcodeAPI(BaseAPI):
         postcode = postcode.replace(" ", "").upper()
         valid_postcode = await self.is_valid_postcode(postcode)
         if not valid_postcode:
-            # Need to create custom exception
+            # Need to create custom exception?
             raise ValueError(f"Invalid postcode: {postcode}")
         try:
             response = await self._throttle_get_request(
                 f"https://api.postcodes.io/postcodes/{postcode}"
             )
-        # Need to handle HTTPStatusError separately to provide better error messages
         except HTTPStatusError as e:
             raise ValueError(f"API error: {e}")
         data = response.json()

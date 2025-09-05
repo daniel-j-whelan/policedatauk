@@ -1,7 +1,11 @@
+"""Tests for utility functions."""
+
 import httpx
 import pytest
+from respx import Mock
 from shapely.errors import GEOSException
 
+from policedatauk import PoliceClient
 from policedatauk.utils import (
     buffer_point,
     parse_polygon,
@@ -10,7 +14,18 @@ from policedatauk.utils import (
 )
 
 
-def test_validate_coordinates():
+def test_validate_coordinates() -> None:
+    """Tests that the coordinates are validated correctly.
+
+    Args:
+        api_client (PoliceClient): The PoliceClient instance.
+        mock_respx (Mock): The respx mock.
+
+    Raises:
+        TypeError: If the latitude or longitude is not a number.
+        ValueError: If the latitude or longitude is out of range.
+
+    """
     validate_lat(51.5074)
     validate_lon(-0.1278)
 
@@ -27,7 +42,17 @@ def test_validate_coordinates():
         validate_lon(-200.0)
 
 
-def test_create_polygon():
+def test_create_polygon() -> None:
+    """Tests that the polygon is created correctly.
+
+    Args:
+        api_client (PoliceClient): The PoliceClient instance.
+        mock_respx (Mock): The respx mock.
+
+    Raises:
+        GEOSException: If the polygon is not valid.
+
+    """
     polygon = buffer_point(51.5074, -0.1278, 1000)
     assert polygon is not None
     assert polygon.startswith("POLYGON ((")
@@ -42,7 +67,16 @@ def test_create_polygon():
 
 
 @pytest.mark.asyncio
-async def test_rate_limit(api_client, mock_respx):
+async def test_rate_limit(api_client: PoliceClient, mock_respx: Mock) -> None:
+    """Test that the rate limit is handled correctly.
+
+    Args:
+        api_client (PoliceClient): The PoliceClient instance.
+        mock_respx (Mock): The respx mock.
+
+    Raises:
+        HTTPStatusError: If the rate limit is exceeded.
+    """
     mock_route = mock_respx.post("/crimes-no-location").respond(
         429, text="Rate limit exceeded"
     )

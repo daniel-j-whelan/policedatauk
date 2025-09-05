@@ -1,1 +1,1 @@
-"""Initialisation file for the tests package."""
+"""Initialisation file for the tests submodule."""

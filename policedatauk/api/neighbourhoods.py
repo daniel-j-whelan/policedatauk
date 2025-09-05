@@ -1,3 +1,5 @@
+"""Neighbourhood module for the policedatauk package."""
+
 import json
 from typing import List
 
@@ -63,7 +65,7 @@ class NeighbourhoodAPI(BaseAPI):
             neighbourhood_id: The ID of the neighbourhood.
 
         Returns:
-            A specific neighbourhood boundary in both GeoJSON and Shapely format.
+            A specific neighbourhood boundary in GeoJSON & Shapely format.
         """
         response = await self._throttle_get_request(
             f"{self.base_url}/{force}/{neighbourhood_id}/boundary"
@@ -76,9 +78,8 @@ class NeighbourhoodAPI(BaseAPI):
         ]
         if coords[0] != coords[-1]:
             coords.append(coords[0])
-        # Need to push this into the geo or parsing segment of utils later
+        # Need to push this into the geo utils segment later
         polygon = Polygon(coords)
-        # print(mapping(polygon))
 
         geojson = {
             "type": "FeatureCollection",

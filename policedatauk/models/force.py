@@ -1,3 +1,5 @@
+"""Force-related pydantic models."""
+
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -6,16 +8,17 @@ from pydantic import BaseModel, Field
 class EngagementMethod(BaseModel):
     """Represents a single engagement method for a police force.
 
-    Engagement methods are used to describe the various ways in which a police force
-    can be contacted or interacted with, such as social media, phone, or email.
+    Engagement methods are used to describe the various ways in which a police
+    force can be contacted or interacted with, such as social media, phone,
+    or email.
 
     Args:
-        url (str): The URL of the engagement method (e.g. a social media profile).
-
-        type (str): The type of engagement method (e.g. facebook, twitter, etc.).
-
-        description (str | None): An optional description of the engagement method.
-
+        url (str): The URL of the engagement method
+            (e.g. a social media profile).
+        type (str): The type of engagement method
+            (e.g. facebook, twitter, etc.).
+        description (str | None): An optional description of the
+            engagement method.
         title (str): The title of the engagement method.
 
     Exceptions:
@@ -50,7 +53,6 @@ class ForceSummary(BaseModel):
 
     Args:
         id (str): The ID of the police force.
-
         name (str): The name of the police force.
 
     Exceptions:
@@ -72,19 +74,16 @@ class ForceSummary(BaseModel):
 class Force(BaseModel):
     """Represents a police force.
 
-    Police forces are responsible for maintaining law and order in a given area.
+    Police forces are responsible for maintaining law and order in
+        a given area.
 
     Args:
         description (str): A description of the police force.
-
         url (str): The URL of the police force's website.
-
-        engagement_methods (list[EngagementMethod]): A list of engagement methods for the police force.
-
+        engagement_methods (list[EngagementMethod]): A list of engagement
+            methods for the police force.
         telephone (str): The telephone number of the police force.
-
         id (str): The ID of the police force.
-
         name (str): The name of the police force.
 
     Exceptions:
@@ -110,11 +109,8 @@ class Person(BaseModel):
 
     Args:
         name (str): Full name of the officer.
-
         rank (str): Rank of the officer.
-
         bio (str): HTML-formatted biography text.
-
         contact_details (dict): Contact information if available.
 
     Exceptions:

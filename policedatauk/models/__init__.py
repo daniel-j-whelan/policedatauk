@@ -1,3 +1,5 @@
+"""Initialisation file for the models submodule."""
+
 from .crime import CrimeCategory, CrimeReport, CrimeWithOutcomes
 from .force import Force, ForceSummary, Person
 from .neighbourhood import (

@@ -1,3 +1,5 @@
+"""Base module for the policedatauk package."""
+
 from aiolimiter import AsyncLimiter
 from httpx import AsyncClient, HTTPStatusError, Response
 
@@ -9,7 +11,14 @@ class BaseAPI:
 
     def __init__(
         self, client: AsyncClient, limiter: AsyncLimiter, base_url: str
-    ):
+    ) -> None:
+        """Initialise the BaseAPI class.
+
+        Args:
+            client: The HTTP client.
+            limiter: The rate limiter.
+            base_url: The base URL for the API.
+        """
         self.client = client
         self.limiter = limiter
         self.base_url = base_url
@@ -27,16 +36,18 @@ class BaseAPI:
                 Defaults to None.
 
             json_mode: If True, send as JSON body (application/json).
-                If False, send as form-encoded (application/x-www-form-urlencoded).
+                If False, send as form-encoded
+                    (application/x-www-form-urlencoded).
                 Defaults to False.
-                True is used for Postcodes.io API.
-                False is used for UK Police API.
+                - True is used for Postcodes.io API.
+                - False is used for UK Police API.
 
         Returns:
             The server response.
 
         Exceptions:
-            HTTPStatusError: If the response status code is 429 (rate limit exceeded).
+            HTTPStatusError: If the response status code is 429
+                (rate limit exceeded).
         """
         async with self.limiter:
             if json_mode:
