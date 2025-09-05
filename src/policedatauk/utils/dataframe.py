@@ -243,5 +243,5 @@ def clean_polars_df(df: pl.DataFrame) -> pl.DataFrame:
         df.pipe(handle_empty_strings)
         .pipe(drop_empty_columns)
         .pipe(drop_empty_rows)
-        .pipe(parse_datetime_columns)
+        # .pipe(parse_datetime_columns) # unsure to include or not yet
     )
