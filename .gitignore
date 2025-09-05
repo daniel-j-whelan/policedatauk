@@ -56,3 +56,4 @@ map.html
 policedatauk/tester.py
 *.ipynb
 policedatauk/geo
+.coverage
