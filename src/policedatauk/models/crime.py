@@ -63,6 +63,16 @@ class CrimeReport(BaseModel):
     outcome_status: CrimeStatus | None = None
     persistent_id: str | None = None
 
+class OutcomeCategory(BaseModel):
+    """Represents a crime outcome category.
+    
+    Args:
+        code (str): Category code, e.g. 'under-investigation'
+        name (str): Human name for the category
+    
+    """
+    code: str = Field(..., description="Category code, e.g. 'under-investigation'")
+    name: str = Field(..., description="Human name for the category")
 
 class LocationOutcome(BaseModel):
     """Represents a crime outcome.
@@ -77,26 +87,22 @@ class LocationOutcome(BaseModel):
         crime (StreetLocation): Crime location of the crime outcome.
     """
 
-    category: Dict[str, str]
+    category: OutcomeCategory
     date: str
     person_id: str | None = None
     crime: StreetLocation
-
 
 class CrimeOutcome(BaseModel):
     """Represents a crime outcome.
 
     Args:
         category (Dict[str, str]): Category of the crime outcome.
-
         date (str): Date of the crime outcome.
-
         person_id (str | None, optional): Person ID of the crime outcome.
-
         crime (StreetLocation): Crime location of the crime outcome.
     """
 
-    category: Dict[str, str]
+    category: OutcomeCategory
     date: str
     person_id: str | None = None
 
