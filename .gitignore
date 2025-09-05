@@ -1,0 +1,60 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Tool-specific cache
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.cache/
+
+# VS Code & IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs & temp
+*.log
+*.tmp
+
+# Testing artifacts
+coverage.*
+htmlcov/
+.tox/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# uv / pip / poetry
+.uv/
+uv.lock
+
+# Jupyter / notebooks (if any)
+.ipynb_checkpoints/
+
+# Secrets (if ever used)
+.env
+.env.*
+
+# Local config files
+*.local
+map.html
+tester.py
+geo/
+*.ipynb
+policedatauk/geo
+.coverage

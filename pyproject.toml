@@ -1,0 +1,66 @@
+[project]
+name = "policedatauk"
+version = "0.1.0"
+description = "Async Python wrapper for the UK Police Data API."
+authors = [{ name = "Daniel Whelan", email = "danieljwhelan@protonmail.com" }]
+readme = "README.md"
+license = {file = "LICENSE.md"}
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic>=2.11.4",
+    "tenacity>=9.1.2",
+    "aiolimiter>=1.2.1",
+    "polars>=1.29.0",
+    "shapely>=2.1.1",
+    "pyproj>=3.7.1",
+]
+
+[project.optional-dependencies]
+geo = [
+    "folium>=0.20.0",
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "respx>=0.22.0",
+    "ruff>=0.12.2",
+    "pytest-cov>=6.2.1",
+]
+
+[tool.uv]
+package = true
+
+[tool.ruff]
+exclude = ["*.ipynb"]
+indent-width = 4
+line-length = 79
+
+[tool.ruff.format]
+indent-style = "space"
+line-ending = "auto"
+quote-style = "double"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint]
+select = [
+    "D1",  # docstring
+    "E",   # pycodestyle
+    "ERA", # commented out code
+    "I",   # isort
+    "W",   # pycodestyle
+    "ANN", # missing type annotation
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = [".", "src"]
+addopts = ["--cov=policedatauk", "--cov-report=term-missing"]
