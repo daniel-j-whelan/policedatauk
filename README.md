@@ -30,13 +30,7 @@
 ## 📦 Installation
 
 ```bash
-pip install policedatauk
-```
-
-With geo support (Shapely + PyProj):
-
-```bash
-pip install policedatauk[geo]
+pip install git+https://github.com/daniel-j-whelan/policedatauk.git
 ```
 
 ---
@@ -48,20 +42,21 @@ import asyncio
 from policedatauk import PoliceClient
 
 
-async def main():
-    async with PoliceClient() as client:
-        # Get all forcess
-        forces = await client.forces.get_all_forces()
-        print(forces[0])
+client = PoliceClient()
 
-        # Crimes in a polygon (January 2024)
-        crimes = await client.crimes.get_crimes_no_location(
-            date="2024-01",
-            force=forces[0].id,
-        )
-        print(crimes)
+# Get all forcess
+forces = await client.forces.get_all_forces()
+print(forces[0])
 
-asyncio.run(main())
+# Crimes in the Avon and Somerset Constabulary (January 2024)
+crimes = await client.crimes.get_crimes_no_location(
+    date="2024-01",
+    force=forces[0].id,
+)
+print(crimes[:2])
+
+# 
+crimes_df = pydantic_to_df(crimes, "crime_reports")
 ```
 
 ---

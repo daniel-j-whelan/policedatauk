@@ -11,7 +11,7 @@ from ..models import (
     NeighbourhoodSummary,
     Person,
 )
-from ..utils import validate_lat, validate_lon
+from ..utils import pydantic_to_df,validate_lat, validate_lon
 from .base import BaseAPI
 
 
@@ -19,7 +19,8 @@ class NeighbourhoodAPI(BaseAPI):
     """Neighbourhood-related API methods for the UK Police API."""
 
     async def get_all_neighbourhoods(
-        self, force: str
+        self, force: str,
+        to_polars: bool = False,
     ) -> List[NeighbourhoodSummary]:
         """Return a list of all neighbourhoods (basic summary only).
         Args:
@@ -32,13 +33,20 @@ class NeighbourhoodAPI(BaseAPI):
             f"{self.base_url}/{force}/neighbourhoods"
         )
         neighbourhoods_data = response.json()
+        if to_polars:
+            return pydantic_to_df(
+                [
+                    NeighbourhoodSummary(**neighbourhood)
+                    for neighbourhood in neighbourhoods_data
+                ]
+            )
         return [
             NeighbourhoodSummary(**neighbourhood)
             for neighbourhood in neighbourhoods_data
         ]
 
     async def get_neighbourhood(
-        self, force: str, neighbourhood_id: str
+        self, force: str, neighbourhood_id: str, to_polars: bool = False,
     ) -> Neighbourhood:
         """Return a specific neighbourhood by ID.
 
@@ -53,6 +61,8 @@ class NeighbourhoodAPI(BaseAPI):
             f"{self.base_url}/{force}/{neighbourhood_id}"
         )
         neighbourhood_data = response.json()
+        if to_polars:
+            return pydantic_to_df(Neighbourhood(**neighbourhood_data))
         return Neighbourhood(**neighbourhood_data)
 
     async def get_boundary(
@@ -96,7 +106,7 @@ class NeighbourhoodAPI(BaseAPI):
         return geojson_str, polygon
 
     async def locate_neighbourhood(
-        self, lat: float, lon: float
+        self, lat: float, lon: float, to_polars: bool = False,
     ) -> Neighbourhood:
         """Return the neighbourhood for a specific latitude and longitude.
 
@@ -114,10 +124,12 @@ class NeighbourhoodAPI(BaseAPI):
             params={"q": f"{lat},{lon}"},
         )
         neighbourhood_data = response.json()
+        if to_polars:
+            return pydantic_to_df(NeighbourhoodResult(**neighbourhood_data))
         return NeighbourhoodResult(**neighbourhood_data)
 
     async def get_people(
-        self, force_id: str, neighbourhood_id: str
+        self, force_id: str, neighbourhood_id: str, to_polars: bool = False,
     ) -> List[Person]:
         """Return a list of people (officers) in a specific police force.
 
@@ -132,4 +144,6 @@ class NeighbourhoodAPI(BaseAPI):
             f"{self.base_url}/{force_id}/{neighbourhood_id}/people"
         )
         people_data = response.json()
+        if to_polars:
+            return pydantic_to_df([Person(**person) for person in people_data])
         return [Person(**person) for person in people_data]

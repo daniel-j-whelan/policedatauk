@@ -4,6 +4,7 @@ import asyncio
 from typing import List
 
 from ..models import Force, ForceSummary, Person
+from ..utils import pydantic_to_df
 from .base import BaseAPI
 
 
@@ -20,7 +21,7 @@ class ForceAPI(BaseAPI):
         forces_data = response.json()
         return [ForceSummary(**force) for force in forces_data]
 
-    async def get_force(self, force_id: str) -> Force:
+    async def get_force(self, force_id: str, to_polars: bool = False) -> Force:
         """Return a specific police force by ID.
 
         Args:
@@ -33,9 +34,11 @@ class ForceAPI(BaseAPI):
             f"{self.base_url}/forces/{force_id}"
         )
         force_data = response.json()
+        if to_polars:
+            return pydantic_to_df(Force(**force_data))
         return Force(**force_data)
 
-    async def get_specific_forces(self, force_ids: List[str]) -> List[Force]:
+    async def get_specific_forces(self, force_ids: List[str], to_polars: bool = False) -> List[Force]:
         """Return a list of police forces by ID in bulk.
 
         Args:
@@ -47,9 +50,11 @@ class ForceAPI(BaseAPI):
         tasks = [self.get_force(force_id) for force_id in force_ids]
         forces = await asyncio.gather(*tasks, return_exceptions=True)
         # Need to add logging here to explain when tasks fail?
+        if to_polars:
+            return pydantic_to_df([force for force in forces if not isinstance(force, Exception)])
         return [force for force in forces if not isinstance(force, Exception)]
 
-    async def get_people(self, force_id: str) -> List[Person]:
+    async def get_people(self, force_id: str, to_polars: bool = False) -> List[Person]:
         """Return a list of people (officers) in a specific police force.
 
         Args:
@@ -62,4 +67,6 @@ class ForceAPI(BaseAPI):
             f"{self.base_url}/forces/{force_id}/people"
         )
         people_data = response.json()
+        if to_polars:
+            return pydantic_to_df([Person(**person) for person in people_data])
         return [Person(**person) for person in people_data]

@@ -7,6 +7,7 @@ from ..utils import (
     buffer_point,
     get_last_month,
     parse_polygon,
+    pydantic_to_df,
     validate_date,
     validate_lat,
     validate_lon,
@@ -24,6 +25,7 @@ class CrimeAPI(BaseAPI):
         radius: int | None = None,
         poly: str | None = None,
         date: str | None = None,
+        to_polars: bool = False,
     ) -> List[CrimeReport]:
         """Return a list of crimes at a specific location.
 
@@ -72,6 +74,8 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/crimes-street/all-crime", params=params
         )
         data = response.json()
+        if to_polars:
+            return pydantic_to_df([CrimeReport(**crime) for crime in data])
         return [CrimeReport(**crime) for crime in data]
 
     async def get_crimes_no_location(
@@ -79,6 +83,7 @@ class CrimeAPI(BaseAPI):
         force: str,
         date: str | None = None,
         category: str | None = None,
+        to_polars: bool = False,
     ) -> List[CrimeReport]:
         """Return a list of crimes without a specific location.
 
@@ -108,9 +113,11 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/crimes-no-location", params=params
         )
         data = response.json()
+        if to_polars:
+            return pydantic_to_df([CrimeReport(**crime) for crime in data])
         return [CrimeReport(**crime) for crime in data]
 
-    async def get_crime_by_id(self, crime_id: str) -> CrimeReport:
+    async def get_crime_by_id(self, crime_id: str, to_polars: bool = False) -> CrimeReport:
         """Return a specific crime report by ID.
 
         Args:
@@ -123,9 +130,11 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/outcomes-for-crime/{crime_id}"
         )
         data = response.json()
+        if to_polars:
+            return pydantic_to_df(CrimeWithOutcomes(**data))
         return CrimeWithOutcomes(**data)
 
-    async def get_crime_categories(self) -> List[CrimeCategory]:
+    async def get_crime_categories(self, to_polars: bool = False) -> List[CrimeCategory]:
         """Return a list of all crime categories.
 
         Returns:
@@ -135,4 +144,6 @@ class CrimeAPI(BaseAPI):
             f"{self.base_url}/crime-categories"
         )
         categories_data = response.json()
+        if to_polars:
+            return pydantic_to_df([CrimeCategory(**category) for category in categories_data])
         return [CrimeCategory(**category) for category in categories_data]
