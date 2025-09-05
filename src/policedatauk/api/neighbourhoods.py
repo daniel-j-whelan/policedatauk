@@ -81,7 +81,7 @@ class NeighbourhoodAPI(BaseAPI):
         self, force: str, neighbourhood_id: str
     ) -> Neighbourhood:
         """Returns the boundary of a specific neighbourhood by ID.
-        
+
         Result is a tuple (GeoJSON & Shapely Polygon format).
 
         Args:
