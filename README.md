@@ -89,7 +89,7 @@ asyncio.run(main())
 ```python
 async def main():
     crime_id_df = await client.crimes.get_crime_by_id(
-        "51e9616788041dfeeacb3c11ec40b9296c32213736f0ad16104173568f0dd4ce",
+        crime_id="51e9616788041dfeeacb3c11ec40b9296c32213736f0ad16104173568f0dd4ce",
         to_polars=True
     )
     print(crime_id_df)
