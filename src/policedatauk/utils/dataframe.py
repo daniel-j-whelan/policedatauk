@@ -1,9 +1,8 @@
 """Utilities for working with Polars DataFrames."""
 
-from typing import Dict, List, Optional
-
 import polars as pl
 from pydantic import BaseModel
+from typing import Dict, List
 
 RENAME_MAP = {
     "crimes": {
@@ -26,13 +25,60 @@ RENAME_MAP = {
 }
 
 
+def flatten_dict(nested_dict: dict, parent_key: str = "", sep: str = "_") -> dict | list[dict]:
+    """Recursively flatten nested dicts.
+    
+    If a value is a list of dicts, expand each element into a row.
+    
+    Args:
+        nested_dict: Nested dict to flatten.
+        parent_key: Parent key of the nested dict.
+        sep: Separator for flattened keys.
+    
+    Returns:
+        Flattened dict.
+    """
+    items = {}
+    for key, value in nested_dict.items():
+        new_key = f"{parent_key}{sep}{key}" if parent_key else key
+        if isinstance(value, dict):
+            items.update(flatten_dict(value, new_key, sep=sep))
+        elif isinstance(value, list) and all(isinstance(i, dict) for i in value):
+            # special case: list of dicts -> multiple rows
+            rows = []
+            for i in value:
+                row = flatten_dict(i, new_key, sep=sep)
+                rows.append(row)
+            return [{**items, **row} for row in rows]
+        else:
+            items[new_key] = value
+    return items
+
+def normalise_records(records: list[dict], sep: str = "_") -> list[dict]:
+    """Flatten dicts and expand lists-of-dicts into multiple rows.
+    
+    Args:
+        records: List of dicts to flatten.
+        sep: Separator for flattened keys.
+    
+    Returns:
+        List of flattened dicts.
+    """
+    flat_records = []
+    for record in records:
+        flattened_record = flatten_dict(record, sep=sep)
+        if isinstance(flattened_record, list):
+            flat_records.extend(flattened_record)
+        else:
+            flat_records.append(flattened_record)
+    return flat_records
+
 def pydantic_to_df(
     models: BaseModel | List[BaseModel],
     sep: str = "_",
     exclude_none: bool = True,
-    explode: bool = True,
-    rename: Optional[Dict[str, str]] = None,
-    rename_key: Optional[str] = None,
+    rename: Dict[str, str] | None = None,
+    rename_key: str | None = None,
 ) -> pl.DataFrame:
     """Converts Pydantic models into a Polars DataFrame.
 
@@ -44,8 +90,6 @@ def pydantic_to_df(
         sep: Separator for flattened keys.
             Default is "_".
         exclude_none: Exclude fields containing Nones in model results.
-        explode: Whether to explode list-of-dicts columns into seperate rows.
-            Default is True.
         rename: Optional dict mapping old column names to new names.
         rename_key: Optional key to look up in RENAME_MAP for renaming.
             If provided, this will override the `rename` argument.
@@ -60,11 +104,10 @@ def pydantic_to_df(
             model.model_dump(exclude_none=exclude_none, mode="json")
             for model in models
         ]
-    df = pl.json_normalize(records, separator=sep)
-    if explode:
-        for col in df.columns:
-            if df.schema[col] == pl.List(pl.Struct):
-                df = df.explode(col).unnest(col)
+        
+    records = normalise_records(records, sep=sep)
+    df = pl.DataFrame(records)
+
     if rename_key:
         df = df.rename(RENAME_MAP.get(rename_key, {}), strict=False)
     elif rename:
