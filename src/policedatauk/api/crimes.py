@@ -121,7 +121,7 @@ class CrimeAPI(BaseAPI):
 
     async def get_crime_by_id(
         self,
-        crime_id: str,
+        crime_id: str | int,
         to_polars: bool = False,
     ) -> CrimeReport:
         """Return a specific crime report by ID.
