@@ -75,12 +75,12 @@ asyncio.run(main())
 
 ```python
 async def main():
-    crimes_df = await client.crimes.get_crimes_no_location(
+    no_location_crimes_df = await client.crimes.get_crimes_no_location(
         date="2024-01",
         force="cambridgeshire",
         to_polars=True,
     )
-    print(crimes_df.head(3))
+    print(no_location_crimes_df.head(3))
 
 asyncio.run(main())
 ```
@@ -89,11 +89,11 @@ asyncio.run(main())
 
 ```python
 async def main():
-    crime_df = await client.crimes.get_crime_by_id(
+    crime_id_df = await client.crimes.get_crime_by_id(
         "51e9616788041dfeeacb3c11ec40b9296c32213736f0ad16104173568f0dd4ce",
         to_polars=True
     )
-    print(crime_df)
+    print(crime_id_df)
 
 asyncio.run(main())
 ```
@@ -168,14 +168,14 @@ async def main():
     print(crimes_in_poly_df.head())
 
     # Example: filter and group
-    shoplifting = (
+    shoplifting_df = (
         crimes_in_poly_df
         .filter(crimes_in_poly_df["crime_code"] == "shoplifting")
         .group_by("outcome_code")
         .len()
         .sort("len", descending=True)
     )
-    print(shoplifting)
+    print(shoplifting_df)
 
 asyncio.run(main())
 ```
