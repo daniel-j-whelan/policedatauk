@@ -80,7 +80,9 @@ class NeighbourhoodAPI(BaseAPI):
     async def get_boundary(
         self, force: str, neighbourhood_id: str
     ) -> Neighbourhood:
-        """Return the boundary of a specific neighbourhood by ID.
+        """Returns the boundary of a specific neighbourhood by ID.
+        
+        Result is a tuple (GeoJSON & Shapely Polygon format).
 
         Args:
             force: The ID of the police force.
