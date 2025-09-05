@@ -11,7 +11,7 @@ from .base import BaseAPI
 class ForceAPI(BaseAPI):
     """Force-related API methods for the UK Police API."""
 
-    async def get_all_forces(self) -> List[Force]:
+    async def get_all_forces(self, to_polars: bool = False) -> List[Force]:
         """Return a list of all police forces (basic summary only).
 
         Returns:
@@ -19,6 +19,10 @@ class ForceAPI(BaseAPI):
         """
         response = await self._throttle_get_request(f"{self.base_url}/forces")
         forces_data = response.json()
+        if to_polars:
+            return pydantic_to_df(
+                [ForceSummary(**force) for force in forces_data]
+            )
         return [ForceSummary(**force) for force in forces_data]
 
     async def get_force(self, force_id: str, to_polars: bool = False) -> Force:
@@ -38,7 +42,9 @@ class ForceAPI(BaseAPI):
             return pydantic_to_df(Force(**force_data))
         return Force(**force_data)
 
-    async def get_specific_forces(self, force_ids: List[str], to_polars: bool = False) -> List[Force]:
+    async def get_specific_forces(
+        self, force_ids: List[str], to_polars: bool = False
+    ) -> List[Force]:
         """Return a list of police forces by ID in bulk.
 
         Args:
@@ -51,10 +57,14 @@ class ForceAPI(BaseAPI):
         forces = await asyncio.gather(*tasks, return_exceptions=True)
         # Need to add logging here to explain when tasks fail?
         if to_polars:
-            return pydantic_to_df([force for force in forces if not isinstance(force, Exception)])
+            return pydantic_to_df(
+                [force for force in forces if not isinstance(force, Exception)]
+            )
         return [force for force in forces if not isinstance(force, Exception)]
 
-    async def get_people(self, force_id: str, to_polars: bool = False) -> List[Person]:
+    async def get_people(
+        self, force_id: str, to_polars: bool = False
+    ) -> List[Person]:
         """Return a list of people (officers) in a specific police force.
 
         Args:

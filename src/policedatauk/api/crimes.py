@@ -117,7 +117,9 @@ class CrimeAPI(BaseAPI):
             return pydantic_to_df([CrimeReport(**crime) for crime in data])
         return [CrimeReport(**crime) for crime in data]
 
-    async def get_crime_by_id(self, crime_id: str, to_polars: bool = False) -> CrimeReport:
+    async def get_crime_by_id(
+        self, crime_id: str, to_polars: bool = False
+    ) -> CrimeReport:
         """Return a specific crime report by ID.
 
         Args:
@@ -134,7 +136,9 @@ class CrimeAPI(BaseAPI):
             return pydantic_to_df(CrimeWithOutcomes(**data))
         return CrimeWithOutcomes(**data)
 
-    async def get_crime_categories(self, to_polars: bool = False) -> List[CrimeCategory]:
+    async def get_crime_categories(
+        self, to_polars: bool = False
+    ) -> List[CrimeCategory]:
         """Return a list of all crime categories.
 
         Returns:
@@ -145,5 +149,7 @@ class CrimeAPI(BaseAPI):
         )
         categories_data = response.json()
         if to_polars:
-            return pydantic_to_df([CrimeCategory(**category) for category in categories_data])
+            return pydantic_to_df(
+                [CrimeCategory(**category) for category in categories_data]
+            )
         return [CrimeCategory(**category) for category in categories_data]
