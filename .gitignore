@@ -53,7 +53,8 @@ uv.lock
 # Local config files
 *.local
 map.html
-policedatauk/tester.py
+tester.py
+geo/
 *.ipynb
 policedatauk/geo
 .coverage
