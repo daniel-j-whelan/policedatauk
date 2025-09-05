@@ -62,5 +62,5 @@ select = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-pythonpath = ["."]
+pythonpath = [".", "src"]
 addopts = ["--cov=policedatauk", "--cov-report=term-missing"]
