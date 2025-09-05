@@ -25,13 +25,42 @@ geo = [
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.4.1",
     "pytest-asyncio>=1.1.0",
     "respx>=0.22.0",
     "ruff>=0.12.2",
+    "pytest-cov>=6.2.1",
+]
+
+[tool.uv]
+package = true
+
+[tool.ruff]
+exclude = ["*.ipynb"]
+indent-width = 4
+line-length = 79
+
+[tool.ruff.format]
+indent-style = "space"
+line-ending = "auto"
+quote-style = "double"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint]
+select = [
+    "D1",  # docstring
+    "E",   # pycodestyle
+    "ERA", # commented out code
+    "I",   # isort
+    "W",   # pycodestyle
+    "ANN", # missing type annotation
 ]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+pythonpath = ["."]
+addopts = ["--cov=policedatauk", "--cov-report=term-missing"]
