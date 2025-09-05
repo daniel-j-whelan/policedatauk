@@ -6,11 +6,12 @@ from typing import Dict, List
 
 RENAME_MAP = {
     "crimes": {
+        "category": "crime_code",
         "location_latitude": "latitude",
         "location_longitude": "longitude",
         "location_street_id": "street_id",
         "location_street_name": "street_name",
-        "outcome_status_category": "outcome_category",
+        "outcome_status_category": "outcome_code",
         "outcome_status_date": "outcome_date",
     },
     "outcomes": {
@@ -18,9 +19,10 @@ RENAME_MAP = {
         "crime_location_longitude": "longitude",
         "crime_location_street_id": "street_id",
         "crime_location_street_name": "street_name",
-        "outcomes_date": "outcome_date",
-        "outcomes_category_name": "outcome_name",
+        "crime_persistent_id": "persistent_id",
         "outcomes_category_code": "outcome_code",
+        "outcomes_category_name": "outcome_name",
+        "outcomes_date": "outcome_date",
     },
 }
 
@@ -54,6 +56,7 @@ def flatten_dict(nested_dict: dict, parent_key: str = "", sep: str = "_") -> dic
             items[new_key] = value
     return items
 
+
 def normalise_records(records: list[dict], sep: str = "_") -> list[dict]:
     """Flatten dicts and expand lists-of-dicts into multiple rows.
     
@@ -72,6 +75,7 @@ def normalise_records(records: list[dict], sep: str = "_") -> list[dict]:
         else:
             flat_records.append(flattened_record)
     return flat_records
+
 
 def pydantic_to_df(
     models: BaseModel | List[BaseModel],
@@ -177,6 +181,10 @@ def drop_empty_rows(df: pl.DataFrame) -> pl.DataFrame:
     Returns:
         DataFrame without all-null rows.
     """
+    
+    if not df.columns:  # <- no columns at all
+        return df
+
     not_null_exprs = [pl.col(column).is_not_null() for column in df.columns]
     any_not_null = pl.any_horizontal(not_null_exprs)
 
