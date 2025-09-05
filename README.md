@@ -13,7 +13,6 @@
 * **Async-first**: Built on `httpx.AsyncClient` for fast, non-blocking API calls.
 * **Typed models**: Pydantic v2 models wrap all responses for safe, validated data.
 * **DataFrames out-of-the-box**: Convert results to [Polars](https://pola.rs) DataFrames for analysis and visualisation.
-<!-- * **Geo-ready**: Optional [Shapely](https://shapely.readthedocs.io/) + [PyProj](https://pyproj4.github.io/pyproj/stable/) support for polygons, WKT, and GeoJSON. -->
 * **Rate limit handling**: Automatic throttling with retries and backoff.
 * **Coverage**: Supports all major Police API endpoints, including:
 
