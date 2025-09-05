@@ -74,7 +74,9 @@ class CrimeAPI(BaseAPI):
         data = response.json()
 
         if to_polars:
-            return pydantic_to_df([CrimeReport(**crime) for crime in data])
+            return pydantic_to_df(
+                [CrimeReport(**crime) for crime in data], rename_key="crimes"
+            )
 
         return [CrimeReport(**crime) for crime in data]
 
@@ -115,7 +117,9 @@ class CrimeAPI(BaseAPI):
         data = response.json()
 
         if to_polars:
-            return pydantic_to_df([CrimeReport(**crime) for crime in data])
+            return pydantic_to_df(
+                [CrimeReport(**crime) for crime in data], rename_key="crimes"
+            )
 
         return [CrimeReport(**crime) for crime in data]
 
@@ -140,7 +144,9 @@ class CrimeAPI(BaseAPI):
         data = response.json()
 
         if to_polars:
-            return pydantic_to_df(CrimeWithOutcomes(**data))
+            return pydantic_to_df(
+                CrimeWithOutcomes(**data), rename_key="outcomes"
+            )
 
         return CrimeWithOutcomes(**data)
 
@@ -164,7 +170,8 @@ class CrimeAPI(BaseAPI):
 
         if to_polars:
             return pydantic_to_df(
-                [CrimeCategory(**category) for category in categories_data]
+                [CrimeCategory(**category) for category in categories_data],
+                rename_key="categories",
             )
 
         return [CrimeCategory(**category) for category in categories_data]

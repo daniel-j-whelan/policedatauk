@@ -1,10 +1,15 @@
 """Utilities for working with Polars DataFrames."""
 
-import polars as pl
-from pydantic import BaseModel
 from typing import Dict, List
 
+import polars as pl
+from pydantic import BaseModel
+
 RENAME_MAP = {
+    "categories": {
+        "name": "category_name",
+        "url": "category_code",
+    },
     "crimes": {
         "category": "crime_code",
         "location_latitude": "latitude",
@@ -27,16 +32,18 @@ RENAME_MAP = {
 }
 
 
-def flatten_dict(nested_dict: dict, parent_key: str = "", sep: str = "_") -> dict | list[dict]:
+def flatten_dict(
+    nested_dict: dict, parent_key: str = "", sep: str = "_"
+) -> dict | list[dict]:
     """Recursively flatten nested dicts.
-    
+
     If a value is a list of dicts, expand each element into a row.
-    
+
     Args:
         nested_dict: Nested dict to flatten.
         parent_key: Parent key of the nested dict.
         sep: Separator for flattened keys.
-    
+
     Returns:
         Flattened dict.
     """
@@ -45,7 +52,9 @@ def flatten_dict(nested_dict: dict, parent_key: str = "", sep: str = "_") -> dic
         new_key = f"{parent_key}{sep}{key}" if parent_key else key
         if isinstance(value, dict):
             items.update(flatten_dict(value, new_key, sep=sep))
-        elif isinstance(value, list) and all(isinstance(i, dict) for i in value):
+        elif isinstance(value, list) and all(
+            isinstance(i, dict) for i in value
+        ):
             # special case: list of dicts -> multiple rows
             rows = []
             for i in value:
@@ -59,11 +68,11 @@ def flatten_dict(nested_dict: dict, parent_key: str = "", sep: str = "_") -> dic
 
 def normalise_records(records: list[dict], sep: str = "_") -> list[dict]:
     """Flatten dicts and expand lists-of-dicts into multiple rows.
-    
+
     Args:
         records: List of dicts to flatten.
         sep: Separator for flattened keys.
-    
+
     Returns:
         List of flattened dicts.
     """
@@ -108,7 +117,7 @@ def pydantic_to_df(
             model.model_dump(exclude_none=exclude_none, mode="json")
             for model in models
         ]
-        
+
     records = normalise_records(records, sep=sep)
     df = pl.DataFrame(records)
 
@@ -181,7 +190,7 @@ def drop_empty_rows(df: pl.DataFrame) -> pl.DataFrame:
     Returns:
         DataFrame without all-null rows.
     """
-    
+
     if not df.columns:  # <- no columns at all
         return df
 
