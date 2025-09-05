@@ -1,14 +1,15 @@
 from typing import List
 
-from .base import BaseAPI
+from ..models import CrimeCategory, CrimeReport, CrimeWithOutcomes
 from ..utils import (
     buffer_point,
+    get_last_month,
     parse_polygon,
     validate_date,
     validate_lat,
     validate_lon,
 )
-from ..models import CrimeCategory, CrimeWithOutcomes, CrimeReport
+from .base import BaseAPI
 
 
 class CrimeAPI(BaseAPI):
@@ -45,7 +46,9 @@ class CrimeAPI(BaseAPI):
         """
         params = {}
         if not poly and not (lat and lon):
-            raise ValueError("Either 'poly' or both 'lat' and 'lon' must be provided.")
+            raise ValueError(
+                "Either 'poly' or both 'lat' and 'lon' must be provided."
+            )
 
         if lat and lon:
             validate_lat(lat)
@@ -59,7 +62,9 @@ class CrimeAPI(BaseAPI):
 
         if date:
             validate_date(date)
-            params["date"] = date
+        else:
+            date = get_last_month()
+        params["date"] = date
         params["poly"] = parsed_poly
         response = await self._throttle_post_request(
             f"{self.base_url}/crimes-street/all-crime", params=params
@@ -90,7 +95,9 @@ class CrimeAPI(BaseAPI):
         params = {"force": force}
         if date:
             validate_date(date)
-            params["date"] = date
+        else:
+            date = get_last_month()
+        params["date"] = date
         if category:
             params["category"] = category
         else:
