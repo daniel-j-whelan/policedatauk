@@ -13,7 +13,7 @@
 * **Async-first**: Built on `httpx.AsyncClient` for fast, non-blocking API calls.
 * **Typed models**: Pydantic v2 models wrap all responses for safe, validated data.
 * **DataFrames out-of-the-box**: Convert results to [Polars](https://pola.rs) DataFrames for analysis and visualisation.
-* **Geo-ready**: Optional [Shapely](https://shapely.readthedocs.io/) + [PyProj](https://pyproj4.github.io/pyproj/stable/) support for polygons, WKT, and GeoJSON.
+<!-- * **Geo-ready**: Optional [Shapely](https://shapely.readthedocs.io/) + [PyProj](https://pyproj4.github.io/pyproj/stable/) support for polygons, WKT, and GeoJSON. -->
 * **Rate limit handling**: Automatic throttling with retries and backoff.
 * **Coverage**: Supports all major Police API endpoints, including:
 
@@ -98,6 +98,35 @@ async def main():
 asyncio.run(main())
 ```
 
+### Postcode Functionality
+
+- Find a Postcode in the vicinity of a lat, lon coordinate
+
+```python
+async def main():
+    find_postcodes_df = await client.postcodes.get_postcode(
+        lat=53.2286,
+        lon=-0.5478,
+        to_polars=True
+    )
+    print(find_postcodes_df)
+
+asyncio.run(main())
+```
+
+- Find more details about your postcode
+
+```python
+async def main():
+    my_postcode_df = await client.postcodes.get_postcode_info(
+        postcode="LN6 7TS",
+        to_polars=True
+    )
+    print(my_postcode_df)
+
+asyncio.run(main())
+```
+
 ### Locate your Neighbourhood
 
 ```python
@@ -175,7 +204,7 @@ forces[:3]
 
 ## 🌍 Geo support
 
-COMING SOON - map integration to display crimes and locations
+COMING SOON - map integration to display crimes and locations using folium
 
 ---
 
@@ -186,13 +215,13 @@ Clone the repo and install in editable mode:
 ```bash
 git clone https://github.com/daniel-j-whelan/policedatauk.git
 cd policedatauk
-pip install -e ".[dev,geo]"
+pip install -e ".[dev]"
 ```
 
 Run tests:
 
 ```bash
-uv run pytest policedatauk\tests
+uv run pytest
 ```
 
 Lint and type check:
@@ -202,29 +231,6 @@ uv run ruff format
 uv run ruff check --fix
 
 ```
-
----
-
-## 📈 Roadmap
-
-* [ ] Complete coverage of all Police API endpoints
-* [ ] Synchronous wrapper (for non-async users)
-* [ ] Map integration for location & crime visualisation
-* [ ] Docs site (MkDocs or Sphinx)
-* [ ] More Polars utilities (e.g. pre-built visualisations)
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-* Fork the repo & create a feature branch
-* Write tests for new features or bugfixes
-* Run `pytest` and `ruff check .` before PR
-* Open a pull request
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
