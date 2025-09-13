@@ -1,18 +1,14 @@
 # policedatauk
 
 > A modern, async-first Python client for the [UK Police Data API](https://data.police.uk/), with Pydantic models and Polars integration.
-
+>
 > NOTE: This repository is still in development and the primary purpose is to understand good python packaging practices.
-
-[![ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
-[![License: GPL](https://img.shields.io/badge/License-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 ---
 
 ## ✨ Features
 
-* **Async-first**: Built on `httpx.AsyncClient` for fast, non-blocking API calls.
+* **Async-first (now with sync support)**: Built on `httpx.AsyncClient` for fast, non-blocking API calls, but also exposes a blocking `httpx.Client` for synchronous use-cases.
 * **Typed models**: Pydantic v2 models wrap all responses for safe, validated data.
 * **DataFrames out-of-the-box**: Convert results to [Polars](https://pola.rs) DataFrames for analysis and visualisation.
 * **Rate limit handling**: Automatic throttling with retries and backoff.
@@ -36,17 +32,20 @@ pip install git+https://github.com/daniel-j-whelan/policedatauk.git
 
 ## 🚀 Examples
 
-All `policedatauk` calls are **asynchronous**.  
-- If you are running code in a **script or terminal**, wrap examples in `asyncio.run(...)`.  
-- If you are running inside a **Jupyter notebook**, call the methods with `await` instead (since a loop is already running).
+`policedatauk` supports **both asynchronous** and **synchronous** clients. Use `AsyncClient` for `async/await` usage and `Client` for blocking (synchronous) code.
 
-### Get Police Forces
+* If you are running code in a **script or terminal** and want async behaviour, wrap examples in `asyncio.run(...)` when using `AsyncClient`.
+* If you prefer **blocking** code, instantiate `Client` and call methods directly (no `await`, no `asyncio`).
+* In a **Jupyter notebook**, use `await` with `AsyncClient` (no `asyncio.run`), or use `Client` synchronously.
+
+### Async
+#### Get Police Forces
 
 ```python
 import asyncio
-from policedatauk import PoliceClient
+from policedatauk import AsyncClient
 
-client = PoliceClient()
+client = AsyncClient()
 
 async def main():
     # List all police forces
@@ -57,22 +56,20 @@ async def main():
 asyncio.run(main())
 ```
 
-### Crimes by Force
+#### Crimes by Force
 
 ```python
 async def main():
-    # Crimes in Avon & Somerset (January 2024)
     crimes = await client.crimes.get_crimes_no_location(
         date="2024-01",
         force="avon-and-somerset",
     )
     print(crimes[:5])
-    # [CrimeReport(id='...', category='violent-crime', ...), ...]
 
 asyncio.run(main())
 ```
 
-### Results as a Polars DataFrame (to_polars)
+#### Results as a Polars DataFrame (to_polars)
 
 ```python
 async def main():
@@ -86,7 +83,7 @@ async def main():
 asyncio.run(main())
 ```
 
-### Get a Specific Crime by ID
+#### Get a Specific Crime by ID
 
 ```python
 async def main():
@@ -99,9 +96,9 @@ async def main():
 asyncio.run(main())
 ```
 
-### Postcode Functionality
+#### Postcode Functionality
 
-- Find a Postcode in the vicinity of a lat, lon coordinate
+* Find Postcodes near coordinates
 
 ```python
 async def main():
@@ -115,7 +112,7 @@ async def main():
 asyncio.run(main())
 ```
 
-- Find more details about your postcode
+* Find more details about your postcode (async)
 
 ```python
 async def main():
@@ -128,11 +125,10 @@ async def main():
 asyncio.run(main())
 ```
 
-### Locate your Neighbourhood
+#### Locate your Neighbourhood
 
 ```python
 async def main():
-    # Locate neighbourhood by coordinates
     neighbourhood_df = await client.neighbourhoods.locate_neighbourhood(
         lat=53.2286,
         lon=-0.5478,
@@ -150,17 +146,15 @@ async def main():
 asyncio.run(main())
 ```
 
-### Crimes Within a Polygon (e.g. a Neighbourhood boundary)
+#### Crimes Within a Polygon (e.g. a Neighbourhood boundary)
 
 ```python
 async def main():
-    # Get neighbourhood boundary polygon
     _, poly = await client.neighbourhoods.get_boundary(
         force="lincolnshire",
         neighbourhood_id="NC14",
     )
 
-    # Crimes inside polygon
     crimes_in_poly_df = await client.crimes.get_crimes_by_location(
         date="2024-01",
         poly=poly,
@@ -168,7 +162,6 @@ async def main():
     )
     print(crimes_in_poly_df.head())
 
-    # Example: filter and group
     shoplifting_df = (
         crimes_in_poly_df
         .filter(crimes_in_poly_df["crime_code"] == "shoplifting")
@@ -181,7 +174,7 @@ async def main():
 asyncio.run(main())
 ```
 
-### Crime Categories
+#### Crime Categories
 
 ```python
 async def main():
@@ -191,17 +184,122 @@ async def main():
 asyncio.run(main())
 ```
 
-### Notes
-- In Jupyter notebooks, drop the asyncio.run(main()) wrapper and just use await directly:
+### Sync
+#### Get Police Forces
 
 ```python
-forces = await client.forces.get_all_forces()
-forces[:3]
+from policedatauk import Client
+
+client = Client()
+
+# List all police forces (blocking)
+forces = client.forces.get_all_forces()
+print(forces[:5])
 ```
 
-- All DataFrame examples use Polars. If to_polars=True is passed, results are returned as pl.DataFrame objects, otherwise they are returned as Pydantic models.
+#### Crimes by Force
+
+```python
+# blocking / synchronous
+crimes = client.crimes.get_crimes_no_location(
+    date="2024-01",
+    force="avon-and-somerset",
+)
+print(crimes[:5])
+```
+
+#### Results as a Polars DataFrame (to_polars)
+
+```python
+no_location_crimes_df = client.crimes.get_crimes_no_location(
+    date="2024-01",
+    force="cambridgeshire",
+    to_polars=True,
+)
+print(no_location_crimes_df.head(3))
+```
+
+#### Get a Specific Crime by ID
+
+```python
+crime_id_df = client.crimes.get_crime_by_id(
+    crime_id="51e9616788041dfeeacb3c11ec40b9296c32213736f0ad16104173568f0dd4ce",
+    to_polars=True,
+)
+print(crime_id_df)
+```
+
+#### Postcode Functionality
+
+```python
+find_postcodes_df = client.postcodes.get_postcode(
+    lat=53.2286,
+    lon=-0.5478,
+    to_polars=True,
+)
+print(find_postcodes_df)
+```
+
+* Find more details about your postcode
+
+```python
+my_postcode_df = client.postcodes.get_postcode_info(
+    postcode="LN6 7TS",
+    to_polars=True,
+)
+print(my_postcode_df)
+```
+
+#### Locate your Neighbourhood
+
+```python
+neighbourhood_df = client.neighbourhoods.locate_neighbourhood(
+    lat=53.2286,
+    lon=-0.5478,
+    to_polars=True,
+)
+print(neighbourhood_df)
+
+# Get neighbourhood boundaries (GeoJSON + shapely Polygon)
+geojson, poly = client.neighbourhoods.get_boundary(
+    force="lincolnshire",
+    neighbourhood_id="NC14",
+)
+print(poly)
+```
+
+#### Crimes Within a Polygon
+
+```python
+_, poly = client.neighbourhoods.get_boundary(
+    force="lincolnshire",
+    neighbourhood_id="NC14",
+)
+
+crimes_in_poly_df = client.crimes.get_crimes_by_location(
+    date="2024-01",
+    poly=poly,
+    to_polars=True,
+)
+print(crimes_in_poly_df.head())
+```
+
+#### Crime Categories
+
+```python
+categories_df = client.crimes.get_crime_categories(to_polars=True)
+print(categories_df)
+```
+
 ---
 
+### Notes
+
+* In Jupyter notebooks, use `await` with `AsyncClient` (no `asyncio.run`), or call `Client` methods directly for synchronous code.
+
+* All DataFrame examples use Polars. If `to_polars=True` is passed, results are returned as `pl.DataFrame` objects, otherwise they are returned as Pydantic models.
+
+---
 
 ## 🌍 Geo support
 
