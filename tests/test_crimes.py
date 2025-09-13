@@ -4,13 +4,13 @@ import polars as pl
 import pytest
 from respx import MockRouter
 
-from policedatauk import PoliceClient
+from policedatauk import AsyncClient
 from policedatauk.utils.dataframe import pydantic_to_df
 
 
 @pytest.mark.asyncio
 async def test_crimes_no_location(
-    api_client: PoliceClient, police_mock_respx: MockRouter
+    api_client: AsyncClient, police_mock_respx: MockRouter
 ) -> None:
     """Tests get_crimes_no_location returns the expected result.
 
@@ -74,7 +74,7 @@ async def test_crimes_no_location(
 
 
 async def test_crimes_by_location(
-    api_client: PoliceClient, police_mock_respx: MockRouter
+    api_client: AsyncClient, police_mock_respx: MockRouter
 ) -> None:
     """Tests get_crimes_by_location returns the expected result.
 
@@ -137,7 +137,7 @@ async def test_crimes_by_location(
     assert mock_route.called
 
 
-async def test_no_geo_params(api_client: PoliceClient) -> None:
+async def test_no_geo_params(api_client: AsyncClient) -> None:
     """Tests get_crimes_by_location fails when no geo params provided."""
     with pytest.raises(ValueError):
         await api_client.crimes.get_crimes_by_location()

@@ -5,7 +5,7 @@ import pytest
 from respx import MockRouter
 from shapely.errors import GEOSException
 
-from policedatauk import PoliceClient
+from policedatauk import AsyncClient
 from policedatauk.utils import (
     buffer_point,
     parse_polygon,
@@ -18,7 +18,7 @@ def test_validate_coordinates() -> None:
     """Tests that the coordinates are validated correctly.
 
     Args:
-        api_client (PoliceClient): The PoliceClient instance.
+        api_client (AsyncClient): The AsyncClient instance.
         mock_respx (Mock): The respx mock.
 
     Raises:
@@ -46,7 +46,7 @@ def test_create_polygon() -> None:
     """Tests that the polygon is created correctly.
 
     Args:
-        api_client (PoliceClient): The PoliceClient instance.
+        api_client (AsyncClient): The AsyncClient instance.
         mock_respx (Mock): The respx mock.
 
     Raises:
@@ -68,12 +68,12 @@ def test_create_polygon() -> None:
 
 @pytest.mark.asyncio
 async def test_rate_limit(
-    api_client: PoliceClient, police_mock_respx: MockRouter
+    api_client: AsyncClient, police_mock_respx: MockRouter
 ) -> None:
     """Test that the rate limit is handled correctly.
 
     Args:
-        api_client (PoliceClient): The PoliceClient instance.
+        api_client (AsyncClient): The AsyncClient instance.
         police_mock_respx (Mock): The respx mock.
 
     Raises:

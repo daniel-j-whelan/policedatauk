@@ -3,17 +3,17 @@
 import pytest
 from respx import MockRouter
 
-from policedatauk import PoliceClient
+from policedatauk import AsyncClient
 
 
 @pytest.mark.asyncio
 async def test_get_postcode(
-    api_client: PoliceClient, postcode_mock_respx: MockRouter
+    api_client: AsyncClient, postcode_mock_respx: MockRouter
 ) -> None:
     """Test that the get_postcode method returns the expected result.
 
     Args:
-        api_client (PoliceClient): The PoliceClient instance.
+        api_client (AsyncClient): The AsyncClient instance.
         postcode_mock_respx (Mock): The respx mock.
 
     Raises:
@@ -87,12 +87,12 @@ async def test_get_postcode(
 
 @pytest.mark.asyncio
 async def test_get_postcode_info(
-    api_client: PoliceClient, postcode_mock_respx: MockRouter
+    api_client: AsyncClient, postcode_mock_respx: MockRouter
 ) -> None:
     """Tests that the get_postcode_info method returns the expected result.
 
     Args:
-        api_client (PoliceClient): The PoliceClient instance.
+        api_client (AsyncClient): The AsyncClient instance.
         postcode_mock_respx (Mock): The respx mock.
 
     Raises:

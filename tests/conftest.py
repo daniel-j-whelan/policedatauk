@@ -6,13 +6,13 @@ import pytest
 import respx
 from aiolimiter import AsyncLimiter
 
-from policedatauk import PoliceClient
+from policedatauk import AsyncClient
 
 
 @pytest.fixture
-def api_client() -> Generator[PoliceClient, None, None]:
-    """Fixture to provide a PoliceClient instance."""
-    client = PoliceClient()
+def api_client() -> Generator[AsyncClient, None, None]:
+    """Fixture to provide an AsyncClient instance."""
+    client = AsyncClient()
     client.limiter = AsyncLimiter(1, 1.0)  # Set a low rate limit for testing
     yield client
 
@@ -30,7 +30,7 @@ def fast_retries(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture
 def police_mock_respx(
-    api_client: PoliceClient,
+    api_client: AsyncClient,
 ) -> Generator[respx.MockRouter, None, None]:
     """Fixture to provide a respx mock for the Police Data API."""
     with respx.mock(base_url=api_client.police_url) as mock:
@@ -39,7 +39,7 @@ def police_mock_respx(
 
 @pytest.fixture
 def postcode_mock_respx(
-    api_client: PoliceClient,
+    api_client: AsyncClient,
 ) -> Generator[respx.MockRouter, None, None]:
     """Fixture to provide a respx mock for the Postcodes.io API."""
     with respx.mock(base_url=api_client.postcode_url) as mock:

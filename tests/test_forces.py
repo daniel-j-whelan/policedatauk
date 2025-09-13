@@ -3,17 +3,17 @@
 import pytest
 from respx import MockRouter
 
-from policedatauk import PoliceClient
+from policedatauk import AsyncClient
 
 
 @pytest.mark.asyncio
 async def test_get_all_forces(
-    api_client: PoliceClient, police_mock_respx: MockRouter
+    api_client: AsyncClient, police_mock_respx: MockRouter
 ) -> None:
     """Tests that the get_all_forces method returns the expected result.
 
     Args:
-        api_client (PoliceClient): The PoliceClient instance.
+        api_client (AsyncClient): The AsyncClient instance.
         mock_respx (Mock): The respx mock.
     """
     mock_route = police_mock_respx.get("/forces").respond(
