@@ -1,36 +1,41 @@
 """Base module for the policedatauk package."""
 
-from aiolimiter import AsyncLimiter
-from httpx import AsyncClient, HTTPStatusError, Response
+from httpx import HTTPStatusError, Response
 
-from ..utils import async_retry
+from ..utils import retry_with_backoff
+from .transports import AsyncTransport, Transport
 
 
 class BaseAPI:
-    """Base class for API interactions with rate limiting and retry logic."""
+    """Base class for API interaction with rate limit & retry logic."""
 
     def __init__(
-        self, client: AsyncClient, limiter: AsyncLimiter, base_url: str
+        self, transport: AsyncTransport | Transport, base_url: str
     ) -> None:
         """Initialise the BaseAPI class.
 
         Args:
-            client: The HTTP client.
-            limiter: The rate limiter.
+            transport: The HTTP transport (sync or async).
             base_url: The base URL for the API.
         """
-        self.client = client
-        self.limiter = limiter
+        self.transport = transport
         self.base_url = base_url
 
-    @async_retry()
-    async def _throttle_post_request(
-        self, url: str, params: dict | None = None, json_mode: bool = False
+
+class BaseAsyncAPI(BaseAPI):
+    """Base class for async API interaction with rate limit & retry logic."""
+
+    @retry_with_backoff()
+    async def post(
+        self,
+        endpoint: str,
+        params: dict | None = None,
+        json_mode: bool = False,
     ) -> Response:
         """Perform a POST request with rate limiting.
 
         Args:
-            url: URL of the request.
+            endpoint: The endpoint of the request.
             params: The data to include in the POST request.
                 Defaults to None.
             json_mode: If True, send as JSON body (application/json).
@@ -47,42 +52,109 @@ class BaseAPI:
             HTTPStatusError: If the response status code is 429
                 (rate limit exceeded).
         """
-        async with self.limiter:
-            if json_mode:
-                response = await self.client.post(url, json=params)
-            else:
-                response = await self.client.post(url, data=params)
+        url = f"{self.base_url}{endpoint}"
+        if json_mode:
+            response = await self.transport.post(url, json=params)
+        else:
+            response = await self.transport.post(url, data=params)
 
-            if response.status_code == 429:
-                raise HTTPStatusError(
-                    "Rate limit exceeded (429)",
-                    request=response.request,
-                    response=response,
-                )
-            response.raise_for_status()
-            return response
+        if response.status_code == 429:
+            raise HTTPStatusError(
+                "Rate limit exceeded (429)",
+                request=response.request,
+                response=response,
+            )
+        response.raise_for_status()
+        return response
 
-    @async_retry()
-    async def _throttle_get_request(
-        self, url: str, params: dict | None = None
-    ) -> Response:
+    @retry_with_backoff()
+    async def get(self, endpoint: str, params: dict | None = None) -> Response:
         """Perform a GET request with rate limiting.
 
         Args:
-            url: URL of the request.
+            endpoint: The endpoint of the request.
             params: The query parameters for the GET request.
                 Defaults to None.
 
         Returns:
             The server response.
         """
-        async with self.limiter:
-            response = await self.client.get(url, params=params)
-            if response.status_code == 429:
-                raise HTTPStatusError(
-                    "Rate limit exceeded (429)",
-                    request=response.request,
-                    response=response,
-                )
-            response.raise_for_status()
-            return response
+        url = f"{self.base_url}{endpoint}"
+        response = await self.transport.get(url, params=params)
+        if response.status_code == 429:
+            raise HTTPStatusError(
+                "Rate limit exceeded (429)",
+                request=response.request,
+                response=response,
+            )
+        response.raise_for_status()
+        return response
+
+
+class BaseSyncAPI(BaseAPI):
+    """Base class for sync API interactions with rate limit & retry logic."""
+
+    @retry_with_backoff()
+    def post(
+        self,
+        endpoint: str,
+        params: dict | None = None,
+        json_mode: bool = False,
+    ) -> Response:
+        """Perform a POST request with rate limiting.
+
+        Args:
+            endpoint: The endpoint of the request.
+            params: The data to include in the POST request.
+                Defaults to None.
+            json_mode: If True, send as JSON body (application/json).
+                If False, send as form-encoded
+                    (application/x-www-form-urlencoded).
+                Defaults to False.
+                - True is used for Postcodes.io API.
+                - False is used for UK Police API.
+
+        Returns:
+            The server response.
+
+        Exceptions:
+            HTTPStatusError: If the response status code is 429
+                (rate limit exceeded).
+        """
+        url = f"{self.base_url}{endpoint}"
+        if json_mode:
+            response = self.transport.post(url, json=params)
+        else:
+            response = self.transport.post(url, data=params)
+
+        if response.status_code == 429:
+            raise HTTPStatusError(
+                "Rate limit exceeded (429)",
+                request=response.request,
+                response=response,
+            )
+        response.raise_for_status()
+        return response
+
+    @retry_with_backoff()
+    def get(self, endpoint: str, params: dict | None = None) -> Response:
+        """Perform a GET request with rate limiting.
+
+        Args:
+            endpoint: The endpoint of the request.
+            params: The query parameters for the GET request.
+                Defaults to None.
+
+        Returns:
+            The server response.
+        """
+        url = f"{self.base_url}{endpoint}"
+        response = self.transport.get(url, params=params)
+        if response.status_code == 429:
+            raise HTTPStatusError(
+                "Rate limit exceeded (429)",
+                request=response.request,
+                response=response,
+            )
+        response.raise_for_status()
+        return response
