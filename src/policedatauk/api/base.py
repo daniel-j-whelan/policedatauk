@@ -28,7 +28,7 @@ class BaseAsyncAPI(BaseAPI):
     @retry_with_backoff()
     async def post(
         self,
-        endpoint: str,
+        endpoint: str | None = None,
         params: dict | None = None,
         json_mode: bool = False,
     ) -> Response:
@@ -36,6 +36,7 @@ class BaseAsyncAPI(BaseAPI):
 
         Args:
             endpoint: The endpoint of the request.
+                Defaults to None.
             params: The data to include in the POST request.
                 Defaults to None.
             json_mode: If True, send as JSON body (application/json).
@@ -68,11 +69,12 @@ class BaseAsyncAPI(BaseAPI):
         return response
 
     @retry_with_backoff()
-    async def get(self, endpoint: str, params: dict | None = None) -> Response:
+    async def get(self, endpoint: str | None = None, params: dict | None = None) -> Response:
         """Perform a GET request with rate limiting.
 
         Args:
             endpoint: The endpoint of the request.
+                Defaults to None.
             params: The query parameters for the GET request.
                 Defaults to None.
 
@@ -97,7 +99,7 @@ class BaseSyncAPI(BaseAPI):
     @retry_with_backoff()
     def post(
         self,
-        endpoint: str,
+        endpoint: str | None = None,
         params: dict | None = None,
         json_mode: bool = False,
     ) -> Response:
@@ -105,6 +107,7 @@ class BaseSyncAPI(BaseAPI):
 
         Args:
             endpoint: The endpoint of the request.
+                Defaults to None.
             params: The data to include in the POST request.
                 Defaults to None.
             json_mode: If True, send as JSON body (application/json).
@@ -137,11 +140,12 @@ class BaseSyncAPI(BaseAPI):
         return response
 
     @retry_with_backoff()
-    def get(self, endpoint: str, params: dict | None = None) -> Response:
+    def get(self, endpoint: str | None = None, params: dict | None = None) -> Response:
         """Perform a GET request with rate limiting.
 
         Args:
             endpoint: The endpoint of the request.
+                Defaults to None.
             params: The query parameters for the GET request.
                 Defaults to None.
 
