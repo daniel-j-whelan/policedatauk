@@ -1,6 +1,5 @@
 """Transport module for the policedatauk package."""
 
-from aiolimiter import AsyncLimiter
 from httpx import AsyncClient, Client, HTTPStatusError, Response
 
 from ..utils import Limiter, retry_with_backoff
@@ -16,7 +15,7 @@ class AsyncTransport:
     """
 
     def __init__(
-        self, base_url: str, client: AsyncClient, limiter: AsyncLimiter
+        self, base_url: str, client: AsyncClient
     ) -> None:
         """Initialise the AsyncTransport class."""
         self.base_url = base_url
