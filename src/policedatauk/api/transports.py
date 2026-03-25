@@ -3,7 +3,7 @@
 from aiolimiter import AsyncLimiter
 from httpx import AsyncClient, Client, HTTPStatusError, Response
 
-from ..utils import retry_with_backoff, Limiter
+from ..utils import Limiter, retry_with_backoff
 
 
 class AsyncTransport:
