@@ -184,7 +184,7 @@ class PostCode(BaseModel):
         description="Police and Fire Authority of the postcode.",
         examples=["West Yorkshire"],
     )
-    codes: Dict[str, str] = Field(
+    codes: Dict[str, str | None] = Field(
         ...,
         description="Codes of the postcode.",
         examples=[{"admin_district": "Calderdale", "admin_ward": "Ryburn"}],
