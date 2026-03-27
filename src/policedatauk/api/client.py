@@ -15,7 +15,6 @@ from .resources.crimes import AsyncCrimes, Crimes
 from .resources.forces import AsyncForces, Forces
 from .resources.neighbourhoods import AsyncNeighbourhoods, Neighbourhoods
 from .resources.postcodes import AsyncPostcodes, Postcodes
-
 from .transports import AsyncTransport, Transport
 
 
