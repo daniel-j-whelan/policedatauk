@@ -1,8 +1,10 @@
 """Transport module for the policedatauk package."""
 
+import asyncio
 from httpx import AsyncClient, Client, HTTPStatusError, Response
+from pyrate_limiter import Limiter
 
-from ..utils import Limiter, retry_with_backoff
+from ...utils import retry_with_backoff
 
 
 class AsyncTransport:
@@ -11,11 +13,14 @@ class AsyncTransport:
     Args:
         base_url (str): The base URL for the API.
         client (AsyncClient): The HTTP client.
-        limiter (AsyncLimiter): The rate limiter.
+        limiter (Limiter): The rate limiter.
     """
 
     def __init__(
-        self, base_url: str, client: AsyncClient
+        self,
+        base_url: str,
+        client: AsyncClient,
+        limiter: Limiter,
     ) -> None:
         """Initialise the AsyncTransport class."""
         self.base_url = base_url
@@ -56,18 +61,18 @@ class AsyncTransport:
         """
         url = self.build_url(endpoint)
 
-        async with self.limiter:
-            response = await self.client.request(method.upper(), url, **kwargs)
+        await self.limiter.try_acquire_async("api", timeout=60)
+        response = await self.client.request(method.upper(), url, **kwargs)
 
-            if response.status_code == 429:
-                raise HTTPStatusError(
-                    "Rate limit exceeded (429)",
-                    request=response.request,
-                    response=response,
-                )
+        if response.status_code == 429:
+            raise HTTPStatusError(
+                "Rate limit exceeded (429)",
+                request=response.request,
+                response=response,
+            )
 
-            response.raise_for_status()
-            return response
+        response.raise_for_status()
+        return response
 
 
 class Transport:
@@ -121,15 +126,15 @@ class Transport:
         """
         url = self.build_url(endpoint)
 
-        with self.limiter:
-            response = self.client.request(method.upper(), url, **kwargs)
+        self.limiter.try_acquire("api", timeout=60)
+        response = self.client.request(method.upper(), url, **kwargs)
 
-            if response.status_code == 429:
-                raise HTTPStatusError(
-                    "Rate limit exceeded (429)",
-                    request=response.request,
-                    response=response,
-                )
+        if response.status_code == 429:
+            raise HTTPStatusError(
+                "Rate limit exceeded (429)",
+                request=response.request,
+                response=response,
+            )
 
-            response.raise_for_status()
-            return response
+        response.raise_for_status()
+        return response
