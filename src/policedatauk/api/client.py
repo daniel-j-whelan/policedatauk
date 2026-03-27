@@ -11,11 +11,11 @@ from pyrate_limiter import (
     Rate,
 )
 
-# from .crimes import CrimeAPI
+from .resources.crimes import AsyncCrimes, Crimes
 from .resources.forces import AsyncForces, Forces
+from .resources.postcodes import AsyncPostcodes, Postcodes
 
 # from .neighbourhoods import NeighbourhoodAPI
-# from .postcodes import PostcodeAPI
 from .transports import AsyncTransport, Transport
 
 
@@ -49,10 +49,10 @@ class Client(BaseClient):
             client=httpx.Client(),
             limiter=Limiter(self.bucket),
         )
-        # self.crimes = CrimeAPI(self.police_transport)
+        self.crimes = Crimes(self.police_transport)
         self.forces = Forces(self.police_transport)
         # self.neighbourhoods = NeighbourhoodAPI(self.police_transport)
-        # self.postcodes = PostcodeAPI(self.postcode_transport)
+        self.postcodes = Postcodes(self.postcode_transport)
 
 
 class AsyncClient(BaseClient):
@@ -72,7 +72,7 @@ class AsyncClient(BaseClient):
             client=httpx.AsyncClient(),
             limiter=Limiter(self.bucket),
         )
-        # self.crimes = CrimeAPI(self.police_transport)
+        self.crimes = AsyncCrimes(self.police_transport)
         self.forces = AsyncForces(self.police_transport)
         # self.neighbourhoods = NeighbourhoodAPI(self.police_transport)
-        # self.postcodes = PostcodeAPI(self.postcode_transport)
+        self.postcodes = AsyncPostcodes(self.postcode_transport)
