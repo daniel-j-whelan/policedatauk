@@ -2,8 +2,8 @@
 
 from typing import List
 
-from ..models import CrimeCategory, CrimeReport, CrimeWithOutcomes
-from ..utils import (
+from ...models import CrimeCategory, CrimeReport, CrimeWithOutcomes
+from ...utils import (
     buffer_point,
     get_last_month,
     parse_polygon,
@@ -12,10 +12,10 @@ from ..utils import (
     validate_lat,
     validate_lon,
 )
-from .base import BaseAPI
+from .base import BaseResource
 
 
-class CrimeAPI(BaseAPI):
+class AsyncCrimes(BaseResource):
     """Crime-related API methods for the UK Police API."""
 
     async def get_crimes_by_location(
