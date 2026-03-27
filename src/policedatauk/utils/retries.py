@@ -12,7 +12,7 @@ from tenacity import (
 
 
 def retry_with_backoff(
-    max_attempts: int = 5, base_wait: int = 1, max_wait: int = 4
+    max_attempts: int = 5, base_wait: int = 1, max_wait: int = 10
 ) -> Callable:
     """Create a retry strategy for HTTPX requests.
 
