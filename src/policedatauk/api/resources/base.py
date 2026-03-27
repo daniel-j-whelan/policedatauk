@@ -1,7 +1,8 @@
 """Base module for the policedatauk resources / endpoints."""
 
-from typing import Any, List, Type, TypeVar
+from typing import List, Type, TypeVar
 
+import polars as pl
 from pydantic import BaseModel
 
 from ...utils import pydantic_to_df
@@ -26,7 +27,7 @@ class BaseResource:
 
     def _format(
         self, data: PydanticModel | List[PydanticModel], to_polars: bool
-    ) -> Any:
+    ) -> PydanticModel | List[PydanticModel] | pl.DataFrame:
         """Conversion from model/s to Polars if requested."""
         if to_polars:
             items = data if isinstance(data, list) else [data]
