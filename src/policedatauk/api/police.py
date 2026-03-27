@@ -3,7 +3,6 @@
 from functools import cached_property
 
 import httpx
-from aiolimiter import AsyncLimiter
 
 from .crimes import CrimeAPI
 from .forces import ForceAPI
@@ -17,17 +16,12 @@ class PoliceClient:
     def __init__(self) -> None:
         """Initialise the PoliceClient class."""
         self.client = httpx.AsyncClient()
-        self.limiter = AsyncLimiter(15, 1.0)
         self.police_url = "https://data.police.uk/api"
         self.postcode_url = "https://api.postcodes.io/postcodes"
-        self.crimes = CrimeAPI(self.client, self.limiter, self.police_url)
-        self.forces = ForceAPI(self.client, self.limiter, self.police_url)
-        self.neighbourhoods = NeighbourhoodAPI(
-            self.client, self.limiter, self.police_url
-        )
-        self.postcodes = PostcodeAPI(
-            self.client, self.limiter, self.postcode_url
-        )
+        self.crimes = CrimeAPI(self.client, self.police_url)
+        self.forces = ForceAPI(self.client, self.police_url)
+        self.neighbourhoods = NeighbourhoodAPI(self.client, self.police_url)
+        self.postcodes = PostcodeAPI(self.client, self.postcode_url)
 
     @cached_property
     def last_updated(self) -> str:

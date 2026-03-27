@@ -3,11 +3,12 @@
 from .dataframe import pydantic_to_df
 from .dates import get_last_month
 from .geo import buffer_point, parse_lat_lon, parse_polygon
-from .retry import async_retry
+from .limits import Limiter
+from .retries import retry_with_backoff
 from .validation import validate_date, validate_lat, validate_lon
 
 __all__ = [
-    "async_retry",
+    "retry_with_backoff",
     "buffer_point",
     "get_last_month",
     "parse_lat_lon",
@@ -16,4 +17,5 @@ __all__ = [
     "validate_date",
     "validate_lat",
     "validate_lon",
+    "Limiter",
 ]

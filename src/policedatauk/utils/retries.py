@@ -11,10 +11,10 @@ from tenacity import (
 )
 
 
-def async_retry(
+def retry_with_backoff(
     max_attempts: int = 5, base_wait: int = 1, max_wait: int = 4
 ) -> Callable:
-    """Create a retry strategy for asynchronous HTTPX requests.
+    """Create a retry strategy for HTTPX requests.
 
     Configures and returns a retry decorator using the tenacity library.
     The retry strategy handles exceptions of types HTTPStatusError and
