@@ -1,28 +1,48 @@
 """Neighbourhood module for the policedatauk package."""
 
 import json
-from typing import List
+from typing import Any, List, Literal, Tuple, overload
 
+import polars as pl
 from shapely.geometry import Polygon, mapping
 
-from ..models import (
+from ...models import (
     Neighbourhood,
     NeighbourhoodResult,
     NeighbourhoodSummary,
     Person,
 )
-from ..utils import pydantic_to_df, validate_lat, validate_lon
-from .base import BaseAPI
+from ...utils import pydantic_to_df, validate_lat, validate_lon
+from ..resources import BaseResource
+from ..transports import AsyncTransport, Transport
 
 
-class NeighbourhoodAPI(BaseAPI):
-    """Neighbourhood-related API methods for the UK Police API."""
+class AsyncNeighbourhoods(BaseResource):
+    """Neighbourhood-related Asynchronous API methods for the UK Police API.
+
+    Args:
+        transport (AsyncTransport): The Transport Client
+    """
+
+    def __init__(self, transport: AsyncTransport) -> None:
+        """Initialise the AsyncNeighbourhoods class."""
+        self.transport = transport
+
+    @overload
+    async def get_all_neighbourhoods(
+        self, force: str, to_polars: Literal[True]
+    ) -> pl.DataFrame: ...
+
+    @overload
+    async def get_all_neighbourhoods(
+        self, force: str, to_polars: Literal[False] = False
+    ) -> List[NeighbourhoodSummary]: ...
 
     async def get_all_neighbourhoods(
         self,
         force: str,
         to_polars: bool = False,
-    ) -> List[NeighbourhoodSummary]:
+    ) -> Any:
         """Return a list of all neighbourhoods (basic summary only).
         Args:
             force: The ID of the police force.
@@ -32,30 +52,33 @@ class NeighbourhoodAPI(BaseAPI):
         Returns:
             A list of all neighbourhoods for a force (basic summary only).
         """
-        response = await self._throttle_get_request(
-            f"{self.base_url}/{force}/neighbourhoods"
+        response = await self.transport.request(
+            "GET", f"/{force}/neighbourhoods"
         )
-        neighbourhoods_data = response.json()
+        models = self._to_model_list(response.json(), NeighbourhoodSummary)
+        return self._format(models, to_polars)
 
-        if to_polars:
-            return pydantic_to_df(
-                [
-                    NeighbourhoodSummary(**neighbourhood)
-                    for neighbourhood in neighbourhoods_data
-                ]
-            )
+    @overload
+    async def get_neighbourhood(
+        self, *, force: str, neighbourhood_id: str, to_polars: Literal[True]
+    ) -> pl.DataFrame: ...
 
-        return [
-            NeighbourhoodSummary(**neighbourhood)
-            for neighbourhood in neighbourhoods_data
-        ]
+    @overload
+    async def get_neighbourhood(
+        self,
+        *,
+        force: str,
+        neighbourhood_id: str,
+        to_polars: Literal[False] = False,
+    ) -> Neighbourhood: ...
 
     async def get_neighbourhood(
         self,
+        *,
         force: str,
         neighbourhood_id: str,
         to_polars: bool = False,
-    ) -> Neighbourhood:
+    ) -> Any:
         """Return a specific neighbourhood by ID.
 
         Args:
@@ -67,32 +90,26 @@ class NeighbourhoodAPI(BaseAPI):
         Returns:
             A specific neighbourhood.
         """
-        response = await self._throttle_get_request(
-            f"{self.base_url}/{force}/{neighbourhood_id}"
+        response = await self.transport.request(
+            "GET", f"/{force}/{neighbourhood_id}"
         )
-        neighbourhood_data = response.json()
-
-        if to_polars:
-            return pydantic_to_df(Neighbourhood(**neighbourhood_data))
-
-        return Neighbourhood(**neighbourhood_data)
+        model = self._to_model(response.json(), Neighbourhood)
+        return self._format(model, to_polars)
 
     async def get_boundary(
         self, force: str, neighbourhood_id: str
-    ) -> Neighbourhood:
+    ) -> Tuple[str, Polygon]:
         """Returns the boundary of a specific neighbourhood by ID.
-
-        Result is a tuple (GeoJSON & Shapely Polygon format).
 
         Args:
             force: The ID of the police force.
             neighbourhood_id: The ID of the neighbourhood.
 
         Returns:
-            A specific neighbourhood boundary in GeoJSON & Shapely format.
+            A tuple containing the GeoJSON string and Shapely Polygon.
         """
-        response = await self._throttle_get_request(
-            f"{self.base_url}/{force}/{neighbourhood_id}/boundary"
+        response = await self.transport.request(
+            "GET", f"/{force}/{neighbourhood_id}/boundary"
         )
         boundary_data = response.json()
 
@@ -100,9 +117,11 @@ class NeighbourhoodAPI(BaseAPI):
             (float(point["longitude"]), float(point["latitude"]))
             for point in boundary_data
         ]
-        if coords[0] != coords[-1]:
+
+        # Ensure polygon is closed!
+        if coords and coords[0] != coords[-1]:
             coords.append(coords[0])
-        # Need to push this into the geo utils segment later
+
         polygon = Polygon(coords)
 
         geojson = {
@@ -115,16 +134,27 @@ class NeighbourhoodAPI(BaseAPI):
                 }
             ],
         }
-        geojson_str = json.dumps(geojson, default=list)
+        geojson_str = json.dumps(geojson)
 
         return geojson_str, polygon
 
+    @overload
+    async def locate_neighbourhood(
+        self, *, lat: float, lon: float, to_polars: Literal[True]
+    ) -> "pl.DataFrame": ...
+
+    @overload
+    async def locate_neighbourhood(
+        self, *, lat: float, lon: float, to_polars: Literal[False] = False
+    ) -> NeighbourhoodResult: ...
+
     async def locate_neighbourhood(
         self,
+        *,
         lat: float,
         lon: float,
         to_polars: bool = False,
-    ) -> Neighbourhood:
+    ) -> Any:
         """Return the neighbourhood for a specific latitude and longitude.
 
         Args:
@@ -138,23 +168,38 @@ class NeighbourhoodAPI(BaseAPI):
         """
         validate_lat(lat)
         validate_lon(lon)
-        response = await self._throttle_get_request(
-            f"{self.base_url}/locate-neighbourhood",
-            params={"q": f"{lat},{lon}"},
+
+        params = {"q": f"{lat},{lon}"}
+
+        response = await self.transport.request(
+            "GET",
+            "/locate-neighbourhood",
+            params=params,
         )
-        neighbourhood_data = response.json()
+        model = self._to_model(response.json(), NeighbourhoodResult)
+        return self._format(model, to_polars)
 
-        if to_polars:
-            return pydantic_to_df(NeighbourhoodResult(**neighbourhood_data))
+    @overload
+    async def get_people(
+        self, *, force_id: str, neighbourhood_id: str, to_polars: Literal[True]
+    ) -> "pl.DataFrame": ...
 
-        return NeighbourhoodResult(**neighbourhood_data)
+    @overload
+    async def get_people(
+        self,
+        *,
+        force_id: str,
+        neighbourhood_id: str,
+        to_polars: Literal[False] = False,
+    ) -> List[Person]: ...
 
     async def get_people(
         self,
+        *,
         force_id: str,
         neighbourhood_id: str,
         to_polars: bool = False,
-    ) -> List[Person]:
+    ) -> Any:
         """Return a list of people (officers) in a specific police force.
 
         Args:
@@ -164,14 +209,210 @@ class NeighbourhoodAPI(BaseAPI):
                 Defaults to False.
 
         Returns:
-            A list of people (officers) in a specific neighbourhood.
+            People (officers) in a specific neighbourhood.
         """
-        response = await self._throttle_get_request(
-            f"{self.base_url}/{force_id}/{neighbourhood_id}/people"
+        response = await self.transport.request(
+            "GET", f"/{force_id}/{neighbourhood_id}/people"
         )
-        people_data = response.json()
+        models = self._to_model_list(response.json(), Person)
+        return self._format(models, to_polars)
 
-        if to_polars:
-            return pydantic_to_df([Person(**person) for person in people_data])
+class Neighbourhoods(BaseResource):
+    """Neighbourhood-related Synchronous API methods for the UK Police API.
 
-        return [Person(**person) for person in people_data]
+    Args:
+        transport (Transport): The Transport Client
+    """
+
+    def __init__(self, transport: Transport) -> None:
+        """Initialise the AsyncNeighbourhoods class."""
+        self.transport = transport
+
+    @overload
+    def get_all_neighbourhoods(
+        self, force: str, to_polars: Literal[True]
+    ) -> pl.DataFrame: ...
+
+    @overload
+    def get_all_neighbourhoods(
+        self, force: str, to_polars: Literal[False] = False
+    ) -> List[NeighbourhoodSummary]: ...
+
+    def get_all_neighbourhoods(
+        self,
+        force: str,
+        to_polars: bool = False,
+    ) -> Any:
+        """Return a list of all neighbourhoods (basic summary only).
+        Args:
+            force: The ID of the police force.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
+
+        Returns:
+            A list of all neighbourhoods for a force (basic summary only).
+        """
+        response = self.transport.request(
+            "GET", f"/{force}/neighbourhoods"
+        )
+        models = self._to_model_list(response.json(), NeighbourhoodSummary)
+        return self._format(models, to_polars)
+
+    @overload
+    def get_neighbourhood(
+        self, *, force: str, neighbourhood_id: str, to_polars: Literal[True]
+    ) -> pl.DataFrame: ...
+
+    @overload
+    def get_neighbourhood(
+        self,
+        *,
+        force: str,
+        neighbourhood_id: str,
+        to_polars: Literal[False] = False,
+    ) -> Neighbourhood: ...
+
+    def get_neighbourhood(
+        self,
+        *,
+        force: str,
+        neighbourhood_id: str,
+        to_polars: bool = False,
+    ) -> Any:
+        """Return a specific neighbourhood by ID.
+
+        Args:
+            force: The ID of the police force.
+            neighbourhood_id: The ID of the neighbourhood.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
+
+        Returns:
+            A specific neighbourhood.
+        """
+        response = self.transport.request(
+            "GET", f"/{force}/{neighbourhood_id}"
+        )
+        model = self._to_model(response.json(), Neighbourhood)
+        return self._format(model, to_polars)
+
+    def get_boundary(
+        self, force: str, neighbourhood_id: str
+    ) -> Tuple[str, Polygon]:
+        """Returns the boundary of a specific neighbourhood by ID.
+
+        Args:
+            force: The ID of the police force.
+            neighbourhood_id: The ID of the neighbourhood.
+
+        Returns:
+            A tuple containing the GeoJSON string and Shapely Polygon.
+        """
+        response = self.transport.request(
+            "GET", f"/{force}/{neighbourhood_id}/boundary"
+        )
+        boundary_data = response.json()
+
+        coords = [
+            (float(point["longitude"]), float(point["latitude"]))
+            for point in boundary_data
+        ]
+
+        # Ensure polygon is closed!
+        if coords and coords[0] != coords[-1]:
+            coords.append(coords[0])
+
+        polygon = Polygon(coords)
+
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"name": neighbourhood_id},
+                    "geometry": mapping(polygon),
+                }
+            ],
+        }
+        geojson_str = json.dumps(geojson)
+
+        return geojson_str, polygon
+
+    @overload
+    def locate_neighbourhood(
+        self, *, lat: float, lon: float, to_polars: Literal[True]
+    ) -> "pl.DataFrame": ...
+
+    @overload
+    def locate_neighbourhood(
+        self, *, lat: float, lon: float, to_polars: Literal[False] = False
+    ) -> NeighbourhoodResult: ...
+
+    def locate_neighbourhood(
+        self,
+        *,
+        lat: float,
+        lon: float,
+        to_polars: bool = False,
+    ) -> Any:
+        """Return the neighbourhood for a specific latitude and longitude.
+
+        Args:
+            lat: The latitude of the location.
+            lon: The longitude of the location.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
+
+        Returns:
+            The neighbourhood for the specific latitude and longitude.
+        """
+        validate_lat(lat)
+        validate_lon(lon)
+
+        params = {"q": f"{lat},{lon}"}
+
+        response = self.transport.request(
+            "GET",
+            "/locate-neighbourhood",
+            params=params,
+        )
+        model = self._to_model(response.json(), NeighbourhoodResult)
+        return self._format(model, to_polars)
+
+    @overload
+    def get_people(
+        self, *, force_id: str, neighbourhood_id: str, to_polars: Literal[True]
+    ) -> "pl.DataFrame": ...
+
+    @overload
+    def get_people(
+        self,
+        *,
+        force_id: str,
+        neighbourhood_id: str,
+        to_polars: Literal[False] = False,
+    ) -> List[Person]: ...
+
+    def get_people(
+        self,
+        *,
+        force_id: str,
+        neighbourhood_id: str,
+        to_polars: bool = False,
+    ) -> Any:
+        """Return a list of people (officers) in a specific police force.
+
+        Args:
+            force_id: The ID of the police force.
+            neighbourhood_id: The ID of the neighbourhood.
+            to_polars: Whether to return the data as a Polars DataFrame.
+                Defaults to False.
+
+        Returns:
+            People (officers) in a specific neighbourhood.
+        """
+        response = self.transport.request(
+            "GET", f"/{force_id}/{neighbourhood_id}/people"
+        )
+        models = self._to_model_list(response.json(), Person)
+        return self._format(models, to_polars)
