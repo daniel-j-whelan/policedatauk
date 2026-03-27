@@ -104,7 +104,7 @@ class AsyncCrimes(BaseResource):
         params["date"] = date
         params["poly"] = parsed_poly
         response = await self.transport.request(
-            "POST", "/crimes-street/all-crime", params=params
+            "POST", "/crimes-street/all-crime", data=params
         )
         crimes = self._to_model_list(response.json(), CrimeReport)
         return self._format(crimes, to_polars)
@@ -311,7 +311,7 @@ class Crimes(BaseResource):
         params["date"] = date
         params["poly"] = parsed_poly
         response = self.transport.request(
-            "POST", "/crimes-street/all-crime", params=params
+            "POST", "/crimes-street/all-crime", data=params
         )
         crimes = self._to_model_list(response.json(), CrimeReport)
         return self._format(crimes, to_polars)
