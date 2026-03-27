@@ -217,6 +217,7 @@ class AsyncNeighbourhoods(BaseResource):
         models = self._to_model_list(response.json(), Person)
         return self._format(models, to_polars)
 
+
 class Neighbourhoods(BaseResource):
     """Neighbourhood-related Synchronous API methods for the UK Police API.
 
@@ -252,9 +253,7 @@ class Neighbourhoods(BaseResource):
         Returns:
             A list of all neighbourhoods for a force (basic summary only).
         """
-        response = self.transport.request(
-            "GET", f"/{force}/neighbourhoods"
-        )
+        response = self.transport.request("GET", f"/{force}/neighbourhoods")
         models = self._to_model_list(response.json(), NeighbourhoodSummary)
         return self._format(models, to_polars)
 

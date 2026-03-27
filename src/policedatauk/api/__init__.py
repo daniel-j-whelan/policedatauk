@@ -2,17 +2,19 @@
 
 from .client import AsyncClient, Client
 from .resources.base import BaseResource
-
-# from .crimes import CrimeAPI
+from .resources.crimes import AsyncCrimes, Crimes
 from .resources.forces import AsyncForces, Forces
-
-# from .neighbourhoods import NeighbourhoodAPI
-# from .postcodes import PostcodeAPI
+from .resources.neighbourhoods import AsyncNeighbourhoods, Neighbourhoods
+from .resources.postcodes import AsyncPostcodes, Postcodes
 
 __all__ = [
     "BaseResource",
-    "AsyncClient",
-    "Client",
+    "AsyncCrimes",
+    "Crimes",
     "AsyncForces",
     "Forces",
+    "AsyncNeighbourhoods",
+    "Neighbourhoods",
+    "AsyncPostcodes",
+    "Postcodes",
 ]
