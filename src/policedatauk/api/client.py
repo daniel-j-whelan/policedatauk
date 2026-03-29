@@ -31,7 +31,7 @@ class BaseClient:
         ]
 
 
-class Client(BaseClient):
+class PoliceClient(BaseClient):
     """Main class for synchronous UK Police & Postcodes.io API interaction."""
 
     def __init__(self, bucket: AbstractBucket | None = None) -> None:
@@ -54,7 +54,7 @@ class Client(BaseClient):
         self.postcodes = Postcodes(self.postcode_transport)
 
 
-class AsyncClient(BaseClient):
+class AsyncPoliceClient(BaseClient):
     """Main class for synchronous UK Police & Postcodes.io API interaction."""
 
     def __init__(self, bucket: AbstractBucket | None = None) -> None:
