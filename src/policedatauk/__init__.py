@@ -1,8 +1,22 @@
 """Initialisation file for the policedatauk package."""
 
-from policedatauk.api.client import AsyncPoliceClient, PoliceClient
+from policedatauk.api.client import PoliceClient, AsyncPoliceClient
+from policedatauk.exceptions import (
+    PoliceDataError,
+    PoliceAPIError,
+    RateLimitError,
+    NotFoundError,
+    ValidationError,
+    NetworkError,
+)
 
 __all__ = [
-    "AsyncPoliceClient",
     "PoliceClient",
+    "AsyncPoliceClient",
+    "PoliceDataError",
+    "PoliceAPIError",
+    "RateLimitError",
+    "NotFoundError",
+    "ValidationError",
+    "NetworkError",
 ]
