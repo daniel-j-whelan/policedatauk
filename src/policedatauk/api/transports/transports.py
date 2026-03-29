@@ -1,10 +1,20 @@
 """Transport module for the policedatauk package."""
 
-import asyncio
-
-from httpx import AsyncClient, Client, HTTPStatusError, Response
+from httpx import (
+    AsyncClient,
+    Client,
+    HTTPStatusError,
+    RequestError,
+    Response,
+    TimeoutException,
+)
 from pyrate_limiter import Limiter
 
+from ...exceptions import (
+    NetworkError,
+    RateLimitError,
+    handle_exceptions,
+)
 from ...utils import retry_with_backoff
 
 
@@ -62,18 +72,22 @@ class AsyncTransport:
         """
         url = self.build_url(endpoint)
 
-        await self.limiter.try_acquire_async("api", timeout=60)
-        response = await self.client.request(method.upper(), url, **kwargs)
-
-        if response.status_code == 429:
-            raise HTTPStatusError(
-                "Rate limit exceeded (429)",
-                request=response.request,
-                response=response,
+        acquired = await self.limiter.try_acquire_async("api", timeout=60)
+        if not acquired:
+            raise RateLimitError(
+                "Local rate limit exceeded. Request blocked before sending."
             )
 
-        response.raise_for_status()
-        return response
+        try:
+            response = await self.client.request(method.upper(), url, **kwargs)
+            response.raise_for_status()
+            return response
+
+        except HTTPStatusError as e:
+            handle_exceptions(e)
+
+        except (RequestError, TimeoutException) as e:
+            raise NetworkError(f"Network connectivity issue: {str(e)}") from e
 
 
 class Transport:
@@ -127,15 +141,17 @@ class Transport:
         """
         url = self.build_url(endpoint)
 
-        self.limiter.try_acquire("api", timeout=60)
-        response = self.client.request(method.upper(), url, **kwargs)
+        acquired = self.limiter.try_acquire("api", timeout=60)
+        if not acquired:
+            raise RateLimitError("Local rate limit exceeded.")
 
-        if response.status_code == 429:
-            raise HTTPStatusError(
-                "Rate limit exceeded (429)",
-                request=response.request,
-                response=response,
-            )
+        try:
+            response = self.client.request(method.upper(), url, **kwargs)
+            response.raise_for_status()
+            return response
 
-        response.raise_for_status()
-        return response
+        except HTTPStatusError as e:
+            handle_exceptions(e)
+
+        except (RequestError, TimeoutException) as e:
+            raise NetworkError(f"Network connectivity issue: {str(e)}") from e
