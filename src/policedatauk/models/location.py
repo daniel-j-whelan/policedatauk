@@ -13,7 +13,7 @@ class StreetLocation(BaseModel):
 
         longitude (str): Longitude of the street location.
 
-        street (Dict[str, str]): Street details of the street location.
+        street (Dict[str, str | int]): Street details of the street location.
     """
 
     latitude: str

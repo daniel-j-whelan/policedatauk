@@ -87,10 +87,10 @@ def parse_lat_lon(coord: str) -> Tuple[float, float]:
     - With or without trailing spaces
 
     Args:
-        coord (str): The coordinate string to parse.
+        coord: The coordinate string to parse.
 
     Returns:
-        Tuple[float, float]: The latitude and longitude.
+        The latitude and longitude.
 
     Raises:
         ValueError if the pattern doesn't match.
@@ -109,7 +109,7 @@ def parse_polygon(polygon: str | Polygon) -> str:
         polygon: The polygon string to parse.
 
     Returns:
-        str: The formatted polygon string ready for police data UK API use.
+        The formatted polygon string ready for police data UK API use.
 
     Raises:
         ValueError if the polygon string is not valid.
