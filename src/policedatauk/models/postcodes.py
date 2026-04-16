@@ -10,58 +10,34 @@ class PostCode(BaseModel):
 
     Args:
         postcode (str): The postcode.
-
         quality (int): The quality of the postcode.
-
         eastings (int): The eastings of the postcode.
-
         northings (int): The northings of the postcode.
-
         country (str): The country of the postcode.
-
         nhs_ha (str): The NHS Health Authority of the postcode.
-
         longitude (float): The longitude of the postcode.
-
         latitude (float): The latitude of the postcode.
-
         european_electoral_region (str): The European electoral region
             of the postcode.
-
         primary_care_trust (str): The primary care trust of the postcode.
-
         region (str): The region of the postcode.
-
         lsoa (str): The Lower Layer Super Output Area of the postcode.
-
         msoa (str): The Middle Layer Super Output Area of the postcode.
-
         incode (str): The incode of the postcode.
-
         outcode (str): The outcode of the postcode.
-
         parliamentary_constituency (str): The parliamentary constituency
             of the postcode.
-
         admin_district (str): The administrative district of the postcode.
-
         parish (str): The parish of the postcode.
-
-        administrative_county (str): The administrative county of the postcode.
-
+        admin_county (str | None): The administrative county of the postcode.
         date_of_introduction (str): The date of introduction of the postcode.
-
         admin_ward (str): The administrative ward of the postcode.
-
-        ced (str): The Community and Environment Department of the postcode.
-
+        ced (str | None): The Community and Environment Department of
+            the postcode.
         ccg (str): The Clinical Commissioning Group of the postcode.
-
         nuts (str): The Nomenclature of Territorial Units for Statistics
             of the postcode.
-
         pfa (str): The Police and Fire Authority of the postcode.
-
         codes (dict): The codes of the postcode.
 
     Exceptions:

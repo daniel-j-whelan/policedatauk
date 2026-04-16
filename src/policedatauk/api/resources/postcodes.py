@@ -15,7 +15,7 @@ class AsyncPostcodes(BaseResource):
     """Postcode-related Asynchronous API methods for the Postcodes.io API.
 
     Args:
-        transport (AsyncTransport): The Transport Client
+        transport: The Transport Client
     """
 
     def __init__(self, transport: AsyncTransport) -> None:
@@ -48,7 +48,7 @@ class AsyncPostcodes(BaseResource):
 
     async def get_postcode_info(
         self, postcode: str, to_polars: bool = False
-    ) -> Any:
+    ) -> pl.DataFrame | PostCode:
         """Return detailed information about a postcode.
 
         Args:
@@ -77,7 +77,7 @@ class AsyncPostcodes(BaseResource):
     @overload
     async def get_postcode(
         self, *, lat: float, lon: float, to_polars: Literal[True]
-    ) -> "pl.DataFrame": ...
+    ) -> pl.DataFrame: ...
 
     @overload
     async def get_postcode(
@@ -86,7 +86,7 @@ class AsyncPostcodes(BaseResource):
 
     async def get_postcode(
         self, *, lat: float, lon: float, to_polars: bool = False
-    ) -> Any:
+    ) -> pl.DataFrame | List[PostCode]:
         """Get the postcode for a specific lat/lon.
 
         Args:
@@ -121,7 +121,7 @@ class Postcodes(BaseResource):
     """Postcode-related Synchronous API methods for the Postcodes.io API.
 
     Args:
-        transport (Transport): The Transport Client
+        transport: The Transport Client
     """
 
     def __init__(self, transport: Transport) -> None:
@@ -152,7 +152,9 @@ class Postcodes(BaseResource):
         self, postcode: str, *, to_polars: Literal[False] = False
     ) -> PostCode: ...
 
-    def get_postcode_info(self, postcode: str, to_polars: bool = False) -> Any:
+    def get_postcode_info(
+        self, postcode: str, to_polars: bool = False
+    ) -> pl.DataFrame | PostCode:
         """Return detailed information about a postcode.
 
         Args:
@@ -181,7 +183,7 @@ class Postcodes(BaseResource):
     @overload
     def get_postcode(
         self, *, lat: float, lon: float, to_polars: Literal[True]
-    ) -> "pl.DataFrame": ...
+    ) -> pl.DataFrame: ...
 
     @overload
     def get_postcode(
@@ -190,7 +192,7 @@ class Postcodes(BaseResource):
 
     def get_postcode(
         self, *, lat: float, lon: float, to_polars: bool = False
-    ) -> Any:
+    ) -> pl.DataFrame | List[PostCode]:
         """Get the postcode for a specific lat/lon.
 
         Args:

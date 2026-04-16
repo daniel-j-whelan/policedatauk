@@ -1,6 +1,6 @@
 """Crime-related pydantic models."""
 
-from typing import Dict, List, Optional
+from typing import List
 
 from pydantic import BaseModel, Field
 
@@ -37,9 +37,11 @@ class CrimeReport(BaseModel):
     Args:
         category (str): Category of the crime report.
 
-        location_type (str): Location type of the crime report.
+        location_type (str | None): Location type of the crime report.
+            Defaults to None.
 
-        location (StreetLocation): Location of the crime report.
+        location (StreetLocation | None): Location of the crime report.
+            Defaults to None.
 
         context (str): Context of the crime report.
 
@@ -47,16 +49,16 @@ class CrimeReport(BaseModel):
 
         month (str): Month of the crime report.
 
-        outcome_status (CrimeStatus | None, optional): Outcome status of
-            the crime report.
+        outcome_status (CrimeStatus | None): Outcome status of a crime report.
+            Defaults to None.
 
-        persistent_id (str | None, optional): Persistent ID of the crime
-            report.
+        persistent_id (str | None): Persistent ID of the crime report.
+            Defaults to None.
     """
 
     category: str
-    location_type: Optional[str] = None
-    location: Optional[StreetLocation] = None
+    location_type: str | None = None
+    location: StreetLocation | None = None
     context: str
     id: int
     month: str
@@ -83,11 +85,11 @@ class LocationOutcome(BaseModel):
     """Represents a crime outcome.
 
     Args:
-        category (Dict[str, str]): Category of the crime outcome.
+        category (OutcomeCategory): Category of the crime outcome.
 
         date (str): Date of the crime outcome.
 
-        person_id (str | None, optional): Person ID of the crime outcome.
+        person_id (str | None): Person ID of the crime outcome.
 
         crime (StreetLocation): Crime location of the crime outcome.
     """
@@ -102,10 +104,9 @@ class CrimeOutcome(BaseModel):
     """Represents a crime outcome.
 
     Args:
-        category (Dict[str, str]): Category of the crime outcome.
+        category (OutcomeCategory): Category of the crime outcome.
         date (str): Date of the crime outcome.
-        person_id (str | None, optional): Person ID of the crime outcome.
-        crime (StreetLocation): Crime location of the crime outcome.
+        person_id (str | None): Person ID of the crime outcome.
     """
 
     category: OutcomeCategory

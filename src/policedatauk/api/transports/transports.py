@@ -22,9 +22,9 @@ class AsyncTransport:
     """Asynchronous HTTP transport class for the policedatauk package.
 
     Args:
-        base_url (str): The base URL for the API.
-        client (AsyncClient): The HTTP client.
-        limiter (Limiter): The rate limiter.
+        base_url: The base URL for the API.
+        client: The HTTP client.
+        limiter: The rate limiter.
     """
 
     def __init__(
@@ -94,9 +94,9 @@ class Transport:
     """Synchronous HTTP transport class for the policedatauk package.
 
     Args:
-        base_url (str): The base URL for the API.
-        client (Client): The HTTP client.
-        limiter (Limiter): The rate limiter.
+        base_url: The base URL for the API.
+        client: The HTTP client.
+        limiter: The rate limiter.
     """
 
     def __init__(

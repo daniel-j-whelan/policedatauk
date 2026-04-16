@@ -10,6 +10,8 @@ from tenacity import (
     wait_exponential,
 )
 
+from ..exceptions import RateLimitError
+
 
 def retry_with_backoff(
     max_attempts: int = 5, base_wait: int = 1, max_wait: int = 10
@@ -33,7 +35,9 @@ def retry_with_backoff(
     """
 
     return retry(
-        retry=retry_if_exception_type((HTTPStatusError, TimeoutException)),
+        retry=retry_if_exception_type(
+            (HTTPStatusError, TimeoutException, RateLimitError)
+        ),
         stop=stop_after_attempt(max_attempts),
         wait=wait_exponential(multiplier=base_wait, max=max_wait),
         reraise=True,
