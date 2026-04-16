@@ -1,13 +1,13 @@
 """Initialisation file for the policedatauk package."""
 
-from policedatauk.api.client import AsyncPoliceClient, PoliceClient
+from policedatauk.api.client import PoliceClient, AsyncPoliceClient
 from policedatauk.exceptions import (
-    NetworkError,
-    NotFoundError,
-    PoliceAPIError,
     PoliceDataError,
+    PoliceAPIError,
     RateLimitError,
+    NotFoundError,
     ValidationError,
+    NetworkError,
 )
 
 __all__ = [
