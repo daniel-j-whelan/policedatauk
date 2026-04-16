@@ -1,17 +1,22 @@
 """Initialisation file for the api submodule."""
 
-from .base import BaseAPI
-from .crimes import CrimeAPI
-from .forces import ForceAPI
-from .neighbourhoods import NeighbourhoodAPI
-from .police import PoliceClient
-from .postcodes import PostcodeAPI
+from .client import AsyncPoliceClient, PoliceClient
+from .resources.base import BaseResource
+from .resources.crimes import AsyncCrimes, Crimes
+from .resources.forces import AsyncForces, Forces
+from .resources.neighbourhoods import AsyncNeighbourhoods, Neighbourhoods
+from .resources.postcodes import AsyncPostcodes, Postcodes
 
 __all__ = [
-    "BaseAPI",
-    "CrimeAPI",
-    "ForceAPI",
-    "NeighbourhoodAPI",
+    "AsyncPoliceClient",
     "PoliceClient",
-    "PostcodeAPI",
+    "BaseResource",
+    "AsyncCrimes",
+    "Crimes",
+    "AsyncForces",
+    "Forces",
+    "AsyncNeighbourhoods",
+    "Neighbourhoods",
+    "AsyncPostcodes",
+    "Postcodes",
 ]

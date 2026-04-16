@@ -7,7 +7,7 @@ from .neighbourhood import (
     NeighbourhoodResult,
     NeighbourhoodSummary,
 )
-from .postcode import PostCode
+from .postcodes import PostCode
 
 __all__ = [
     "CrimeCategory",

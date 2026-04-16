@@ -10,11 +10,13 @@ from tenacity import (
     wait_exponential,
 )
 
+from ..exceptions import RateLimitError
 
-def async_retry(
-    max_attempts: int = 5, base_wait: int = 1, max_wait: int = 4
+
+def retry_with_backoff(
+    max_attempts: int = 5, base_wait: int = 1, max_wait: int = 10
 ) -> Callable:
-    """Create a retry strategy for asynchronous HTTPX requests.
+    """Create a retry strategy for HTTPX requests.
 
     Configures and returns a retry decorator using the tenacity library.
     The retry strategy handles exceptions of types HTTPStatusError and
@@ -33,7 +35,9 @@ def async_retry(
     """
 
     return retry(
-        retry=retry_if_exception_type((HTTPStatusError, TimeoutException)),
+        retry=retry_if_exception_type(
+            (HTTPStatusError, TimeoutException, RateLimitError)
+        ),
         stop=stop_after_attempt(max_attempts),
         wait=wait_exponential(multiplier=base_wait, max=max_wait),
         reraise=True,

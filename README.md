@@ -1,7 +1,6 @@
 # policedatauk
 
-> A modern, async-first Python client for the [UK Police Data API](https://data.police.uk/), with Pydantic models and Polars integration.
-> NOTE: This repository is still in development and the primary purpose is to understand good python packaging practices.
+> A modern, robust Python client for the [UK Police Data API](https://data.police.uk/), featuring built-in Pydantic v2 validation, native Polars integration, and first-class Sync & Async support.
 
 [![ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
@@ -11,21 +10,17 @@
 
 ## ✨ Features
 
-* **Async-first**: Built on `httpx.AsyncClient` for fast, non-blocking API calls.
-* **Typed models**: Pydantic v2 models wrap all responses for safe, validated data.
-* **DataFrames out-of-the-box**: Convert results to [Polars](https://pola.rs) DataFrames for analysis and visualisation.
-* **Rate limit handling**: Automatic throttling with retries and backoff.
-* **Coverage**: Supports all major Police API endpoints, including:
-
-  * Crimes
-  * Outcomes
-  * Forces & neighbourhoods
-  * Stop & search
-  * Postcode lookup
+* **Dual Architecture:** Choose between a simple Synchronous client or a high-performance Asynchronous client (both `httpx` backed).
+* **Type-Safe Models:** All API responses are rigorously validated and serialized using `pydantic` v2.
+* **Native DataFrames:** Instantly convert deeply nested JSON API responses into clean, flat [Polars](https://pola.rs) DataFrames with a single argument (`to_polars=True`).
+* **Resilience:** Built-in rate limiting, exponential backoff, and retry logic to gracefully handle API throttling.
+* **Geospatial Support:** Reverse geocoding for postcodes, neighbourhood boundary polygon generation, and spatial crime filtering.
 
 ---
 
 ## 📦 Installation
+
+Install via pip (or uv):
 
 ```bash
 pip install git+https://github.com/daniel-j-whelan/policedatauk.git
@@ -33,204 +28,122 @@ pip install git+https://github.com/daniel-j-whelan/policedatauk.git
 
 ---
 
-## 🚀 Examples
+## 🚀 Quick Start
 
-All `policedatauk` calls are **asynchronous**.  
-- If you are running code in a **script or terminal**, wrap examples in `asyncio.run(...)`.  
-- If you are running inside a **Jupyter notebook**, call the methods with `await` instead (since a loop is already running).
+The library provides two clients depending on your needs: `PoliceClient` for standard scripts and notebooks, and `AsyncPoliceClient` for high-concurrency web apps or data pipelines.
 
-### Get Police Forces
+### Standard (Synchronous) Usage
 
 ```python
-import asyncio
 from policedatauk import PoliceClient
 
 client = PoliceClient()
 
+# List all police forces
+forces = client.forces.get_all_forces()
+print(forces[0].name) 
+# Output: Avon and Somerset Constabulary
+
+# Get crimes for a force as a Polars DataFrame
+crimes_df = client.crimes.get_crimes_no_location(
+    date="2024-01",
+    force="avon-and-somerset",
+    to_polars=True
+)
+print(crimes_df.head(3))
+```
+
+### High-Performance (Asynchronous) Usage
+
+```python
+import asyncio
+from policedatauk import AsyncPoliceClient
+
 async def main():
-    # List all police forces
-    forces = await client.forces.get_all_forces()
-    print(forces[:5])
-    # Force(id='avon-and-somerset', name='Avon and Somerset Constabulary')
+    client = AsyncPoliceClient()
+    
+    # Fetch crime categories
+    categories = await client.crimes.get_crime_categories()
+    print(categories[:3])
 
 asyncio.run(main())
 ```
-
-### Crimes by Force
-
-```python
-async def main():
-    # Crimes in Avon & Somerset (January 2024)
-    crimes = await client.crimes.get_crimes_no_location(
-        date="2024-01",
-        force="avon-and-somerset",
-    )
-    print(crimes[:5])
-    # [CrimeReport(id='...', category='violent-crime', ...), ...]
-
-asyncio.run(main())
-```
-
-### Results as a Polars DataFrame (to_polars)
-
-```python
-async def main():
-    no_location_crimes_df = await client.crimes.get_crimes_no_location(
-        date="2024-01",
-        force="cambridgeshire",
-        to_polars=True,
-    )
-    print(no_location_crimes_df.head(3))
-
-asyncio.run(main())
-```
-
-### Get a Specific Crime by ID
-
-```python
-async def main():
-    crime_id_df = await client.crimes.get_crime_by_id(
-        crime_id="51e9616788041dfeeacb3c11ec40b9296c32213736f0ad16104173568f0dd4ce",
-        to_polars=True
-    )
-    print(crime_id_df)
-
-asyncio.run(main())
-```
-
-### Postcode Functionality
-
-- Find a Postcode in the vicinity of a lat, lon coordinate
-
-```python
-async def main():
-    find_postcodes_df = await client.postcodes.get_postcode(
-        lat=53.2286,
-        lon=-0.5478,
-        to_polars=True
-    )
-    print(find_postcodes_df)
-
-asyncio.run(main())
-```
-
-- Find more details about your postcode
-
-```python
-async def main():
-    my_postcode_df = await client.postcodes.get_postcode_info(
-        postcode="LN6 7TS",
-        to_polars=True
-    )
-    print(my_postcode_df)
-
-asyncio.run(main())
-```
-
-### Locate your Neighbourhood
-
-```python
-async def main():
-    # Locate neighbourhood by coordinates
-    neighbourhood_df = await client.neighbourhoods.locate_neighbourhood(
-        lat=53.2286,
-        lon=-0.5478,
-        to_polars=True
-    )
-    print(neighbourhood_df)
-
-    # Get neighbourhood boundaries (GeoJSON + shapely Polygon)
-    geojson, poly = await client.neighbourhoods.get_boundary(
-        force="lincolnshire",
-        neighbourhood_id="NC14",
-    )
-    print(poly)
-
-asyncio.run(main())
-```
-
-### Crimes Within a Polygon (e.g. a Neighbourhood boundary)
-
-```python
-async def main():
-    # Get neighbourhood boundary polygon
-    _, poly = await client.neighbourhoods.get_boundary(
-        force="lincolnshire",
-        neighbourhood_id="NC14",
-    )
-
-    # Crimes inside polygon
-    crimes_in_poly_df = await client.crimes.get_crimes_by_location(
-        date="2024-01",
-        poly=poly,
-        to_polars=True
-    )
-    print(crimes_in_poly_df.head())
-
-    # Example: filter and group
-    shoplifting_df = (
-        crimes_in_poly_df
-        .filter(crimes_in_poly_df["crime_code"] == "shoplifting")
-        .group_by("outcome_code")
-        .len()
-        .sort("len", descending=True)
-    )
-    print(shoplifting_df)
-
-asyncio.run(main())
-```
-
-### Crime Categories
-
-```python
-async def main():
-    categories_df = await client.crimes.get_crime_categories(to_polars=True)
-    print(categories_df)
-
-asyncio.run(main())
-```
-
-### Notes
-- In Jupyter notebooks, drop the asyncio.run(main()) wrapper and just use await directly:
-
-```python
-forces = await client.forces.get_all_forces()
-forces[:3]
-```
-
-- All DataFrame examples use Polars. If to_polars=True is passed, results are returned as pl.DataFrame objects, otherwise they are returned as Pydantic models.
----
-
-
-## 🌍 Geo support
-
-COMING SOON - map integration to display crimes and locations using folium
+*(Note: If you are running code inside a Jupyter Notebook, an event loop is already running. You can drop `asyncio.run()` and use `await` directly.)*
 
 ---
 
-## 🧪 Development
+## 💡 Advanced Examples
 
-Clone the repo and install in editable mode:
+### Geospatial & Neighbourhoods
+You can locate neighbourhoods via coordinates and extract their exact boundary polygons (returned as both GeoJSON and Shapely formats).
 
-```bash
-git clone https://github.com/daniel-j-whelan/policedatauk.git
-cd policedatauk
-pip install -e ".[dev]"
+```python
+from policedatauk import PoliceClient
+
+client = PoliceClient()
+
+# 1. Find neighbourhood by coordinates
+neighbourhood = client.neighbourhoods.locate_neighbourhood(
+    lat=53.2286,
+    lon=-0.5478
+)
+print(f"Force: {neighbourhood.force}, Neighbourhood: {neighbourhood.neighbourhood}")
+
+# 2. Get the boundary polygon
+geojson, poly = client.neighbourhoods.get_boundary(
+    force="lincolnshire",
+    neighbourhood_id="NC14"
+)
+
+# 3. Find all crimes within that specific boundary
+crimes_in_poly_df = client.crimes.get_crimes_by_location(
+    date="2024-01",
+    poly=poly,  # Automatically handles the POST request
+    to_polars=True
+)
+
+# 4. Filter and Group using Polars
+shoplifting_stats = (
+    crimes_in_poly_df
+    .filter(crimes_in_poly_df["crime_code"] == "shoplifting")
+    .group_by("outcome_code")
+    .len()
+    .sort("len", descending=True)
+)
+print(shoplifting_stats)
 ```
 
-Run tests:
+### Postcode Resolution
+The library seamlessly integrates with `postcodes.io` to translate real-world postcodes into usable coordinates for the Police API.
 
-```bash
-uv run pytest
+```python
+from policedatauk import PoliceClient
+
+client = PoliceClient()
+
+# Get detailed info about a specific postcode
+my_postcode = client.postcodes.get_postcode_info(postcode="LN6 7TS")
+print(my_postcode.latitude, my_postcode.longitude)
+
+# Find nearest postcodes to a coordinate
+nearby_postcodes_df = client.postcodes.get_postcode(
+    lat=53.2286,
+    lon=-0.5478,
+    to_polars=True
+)
 ```
 
-Lint and type check:
+---
 
-```bash
-uv run ruff format
-uv run ruff check --fix
+## 🛠️ Data Handling: Models vs. DataFrames
 
-```
+By default, all methods return highly structured **Pydantic Models**. This provides perfect IDE auto-completion and type safety.
+
+If you are data-analysing, pass `to_polars=True`. The library will automatically:
+1. Flatten deeply nested API responses.
+2. Resolve empty strings and missing values.
+3. Standardize column names across endpoints.
+4. Return a highly optimized `pl.DataFrame`.
 
 ---
 

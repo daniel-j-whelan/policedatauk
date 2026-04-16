@@ -10,10 +10,10 @@ dependencies = [
     "httpx>=0.28.1",
     "pydantic>=2.11.4",
     "tenacity>=9.1.2",
-    "aiolimiter>=1.2.1",
     "polars>=1.29.0",
-    "shapely>=2.1.1",
     "pyproj>=3.7.1",
+    "pyrate-limiter>=4.1.0",
+    "shapely>=2.1.2",
 ]
 
 [project.optional-dependencies]
@@ -58,6 +58,10 @@ select = [
     "I",   # isort
     "W",   # pycodestyle
     "ANN", # missing type annotation
+]
+ignore = [
+    "ANN003", # Missing type annotation for **kwargs
+    "ANN002", # Missing type annotation for *args
 ]
 
 [tool.pytest.ini_options]

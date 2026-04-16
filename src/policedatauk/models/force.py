@@ -1,7 +1,5 @@
 """Force-related pydantic models."""
 
-from typing import Optional
-
 from pydantic import BaseModel, Field
 
 
@@ -123,7 +121,7 @@ class Person(BaseModel):
     rank: str = Field(
         ..., description="Rank of the officer.", examples=["Chief Constable"]
     )
-    bio: Optional[str] = Field(
+    bio: str | None = Field(
         None,
         description="HTML-formatted biography text.",
         examples=["<p>John Doe is the Chief Constable of...</p>"],
