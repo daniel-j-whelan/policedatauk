@@ -21,7 +21,7 @@ class AsyncNeighbourhoods(BaseResource):
     """Neighbourhood-related Asynchronous API methods for the UK Police API.
 
     Args:
-        transport (AsyncTransport): The Transport Client
+        transport: The Transport Client
     """
 
     def __init__(self, transport: AsyncTransport) -> None:
@@ -42,7 +42,7 @@ class AsyncNeighbourhoods(BaseResource):
         self,
         force: str,
         to_polars: bool = False,
-    ) -> Any:
+    ) -> pl.DataFrame | List[NeighbourhoodSummary]:
         """Return a list of all neighbourhoods (basic summary only).
         Args:
             force: The ID of the police force.
@@ -50,7 +50,7 @@ class AsyncNeighbourhoods(BaseResource):
                 Defaults to False.
 
         Returns:
-            A list of all neighbourhoods for a force (basic summary only).
+            All neighbourhoods for a force (basic summary only).
         """
         response = await self.transport.request(
             "GET", f"/{force}/neighbourhoods"
@@ -78,7 +78,7 @@ class AsyncNeighbourhoods(BaseResource):
         force: str,
         neighbourhood_id: str,
         to_polars: bool = False,
-    ) -> Any:
+    ) -> pl.DataFrame | Neighbourhood:
         """Return a specific neighbourhood by ID.
 
         Args:
@@ -141,7 +141,7 @@ class AsyncNeighbourhoods(BaseResource):
     @overload
     async def locate_neighbourhood(
         self, *, lat: float, lon: float, to_polars: Literal[True]
-    ) -> "pl.DataFrame": ...
+    ) -> pl.DataFrame: ...
 
     @overload
     async def locate_neighbourhood(
@@ -154,7 +154,7 @@ class AsyncNeighbourhoods(BaseResource):
         lat: float,
         lon: float,
         to_polars: bool = False,
-    ) -> Any:
+    ) -> pl.DataFrame | NeighbourhoodResult:
         """Return the neighbourhood for a specific latitude and longitude.
 
         Args:
@@ -182,7 +182,7 @@ class AsyncNeighbourhoods(BaseResource):
     @overload
     async def get_people(
         self, *, force_id: str, neighbourhood_id: str, to_polars: Literal[True]
-    ) -> "pl.DataFrame": ...
+    ) -> pl.DataFrame: ...
 
     @overload
     async def get_people(
@@ -199,7 +199,7 @@ class AsyncNeighbourhoods(BaseResource):
         force_id: str,
         neighbourhood_id: str,
         to_polars: bool = False,
-    ) -> Any:
+    ) -> pl.DataFrame | List[Person]:
         """Return a list of people (officers) in a specific police force.
 
         Args:
@@ -222,7 +222,7 @@ class Neighbourhoods(BaseResource):
     """Neighbourhood-related Synchronous API methods for the UK Police API.
 
     Args:
-        transport (Transport): The Transport Client
+        transport: The Transport Client
     """
 
     def __init__(self, transport: Transport) -> None:
@@ -243,7 +243,7 @@ class Neighbourhoods(BaseResource):
         self,
         force: str,
         to_polars: bool = False,
-    ) -> Any:
+    ) -> pl.DataFrame | List[NeighbourhoodSummary]:
         """Return a list of all neighbourhoods (basic summary only).
         Args:
             force: The ID of the police force.
@@ -277,7 +277,7 @@ class Neighbourhoods(BaseResource):
         force: str,
         neighbourhood_id: str,
         to_polars: bool = False,
-    ) -> Any:
+    ) -> pl.DataFrame | Neighbourhood:
         """Return a specific neighbourhood by ID.
 
         Args:
@@ -340,7 +340,7 @@ class Neighbourhoods(BaseResource):
     @overload
     def locate_neighbourhood(
         self, *, lat: float, lon: float, to_polars: Literal[True]
-    ) -> "pl.DataFrame": ...
+    ) -> pl.DataFrame: ...
 
     @overload
     def locate_neighbourhood(
@@ -353,7 +353,7 @@ class Neighbourhoods(BaseResource):
         lat: float,
         lon: float,
         to_polars: bool = False,
-    ) -> Any:
+    ) -> pl.DataFrame | NeighbourhoodResult:
         """Return the neighbourhood for a specific latitude and longitude.
 
         Args:
@@ -381,7 +381,7 @@ class Neighbourhoods(BaseResource):
     @overload
     def get_people(
         self, *, force_id: str, neighbourhood_id: str, to_polars: Literal[True]
-    ) -> "pl.DataFrame": ...
+    ) -> pl.DataFrame: ...
 
     @overload
     def get_people(
@@ -398,7 +398,7 @@ class Neighbourhoods(BaseResource):
         force_id: str,
         neighbourhood_id: str,
         to_polars: bool = False,
-    ) -> Any:
+    ) -> pl.DataFrame | List[Person]:
         """Return a list of people (officers) in a specific police force.
 
         Args:

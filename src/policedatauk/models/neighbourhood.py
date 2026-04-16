@@ -1,6 +1,6 @@
 """Neighbourhood-related pydantic models."""
 
-from typing import Optional
+from typing import List
 
 from pydantic import BaseModel, Field
 
@@ -75,8 +75,8 @@ class NeighbourhoodLocation(BaseModel):
 
     Args:
         name (str | None): Name of the location (if available).
-        longitude (str): Longitude of the location.
-        latitude (str): Latitude of the location.
+        longitude (str | None): Longitude of the location.
+        latitude (str | None): Latitude of the location.
         postcode (str | None): Postcode of the location.
         address (str | None): Address of the location.
         telephone (str | None): Telephone number of the location.
@@ -113,11 +113,12 @@ class Neighbourhood(BaseModel):
         description (str): A description of the neighbourhood.
         contact_details (dict): Contact information for the neighbourhood.
         name (str): The name of the neighbourhood.
-        links (list[NeighbourhoodLinks]): A list of follow-on links for
+        links (List[NeighbourhoodLinks]): A list of follow-on links for
             the neighbourhood.
         centre (dict): The latitude and longitude of the neighbourhood's
             centre point.
-        locations (list[dict]): A list of locations within the neighbourhood.
+        locations (List[NeighbourhoodLocation]): A list of locations within
+            the neighbourhood.
         url_force (str): The URL of the neighbourhood's website.
         population (str): The population of the neighbourhood.
 
@@ -133,7 +134,7 @@ class Neighbourhood(BaseModel):
     description: str | None = Field(
         None, description="Description of the neighbourhood."
     )
-    links: list[NeighbourhoodLinks] = Field(
+    links: List[NeighbourhoodLinks] = Field(
         ..., description="List of follow-on links."
     )
     id: str = Field(..., description="ID of the neighbourhood.")
@@ -143,7 +144,7 @@ class Neighbourhood(BaseModel):
             "Latitude and longitude of the neighbourhood's centre point.",
         ),
     )
-    locations: list[NeighbourhoodLocation] = Field(
+    locations: List[NeighbourhoodLocation] = Field(
         ..., description="List of locations within the neighbourhood."
     )
     url_force: str = Field(
@@ -160,7 +161,7 @@ class Person(BaseModel):
     Args:
         name (str): Full name of the officer.
         rank (str): Rank of the officer.
-        bio (str): HTML-formatted biography text.
+        bio (str | None): HTML-formatted biography text.
         contact_details (dict): Contact information if available.
 
     Exceptions:
@@ -173,7 +174,7 @@ class Person(BaseModel):
     rank: str = Field(
         ..., description="Rank of the officer.", examples=["Chief Constable"]
     )
-    bio: Optional[str] = Field(
+    bio: str | None = Field(
         None,
         description="HTML-formatted biography text.",
         examples=["<p>John Doe is the Chief Constable of...</p>"],

@@ -19,7 +19,7 @@ from .transports import AsyncTransport, Transport
 
 
 class BaseClient:
-    """Shared configuration for both clients."""
+    """Shared configuration for both sync and async clients."""
 
     def __init__(self) -> None:
         """The Base Client."""
@@ -55,7 +55,7 @@ class PoliceClient(BaseClient):
 
 
 class AsyncPoliceClient(BaseClient):
-    """Main class for synchronous UK Police & Postcodes.io API interaction."""
+    """Main class for Asynchronous UK Police & Postcodes.io API interaction."""
 
     def __init__(self, bucket: AbstractBucket | None = None) -> None:
         """Initialise the PoliceClient class."""

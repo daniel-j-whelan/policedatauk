@@ -208,7 +208,7 @@ def parse_datetime_columns(df: pl.DataFrame) -> pl.DataFrame:
     format string: "%d-%m-%YT%H:%M:%SZ".
 
     Args:
-        df (pl.DataFrame): The input DataFrame.
+        df: The input DataFrame.
 
     Returns:
         DataFrame with datetime columns parsed.
@@ -234,7 +234,7 @@ def clean_polars_df(df: pl.DataFrame) -> pl.DataFrame:
     - Drop rows with no meaningful data
 
     Args:
-        df (pl.DataFrame): The input DataFrame.
+        df: The input DataFrame.
 
     Returns:
         DataFrame with cleaned data.

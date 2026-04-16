@@ -15,7 +15,7 @@ class AsyncForces(BaseResource):
     """Force-related Asynchronous API methods for the UK Police API.
 
     Args:
-        transport (AsyncTransport): The Transport Client
+        transport: The Transport Client
     """
 
     def __init__(self, transport: AsyncTransport) -> None:
@@ -32,7 +32,9 @@ class AsyncForces(BaseResource):
         self, to_polars: Literal[False] = False
     ) -> List[ForceSummary]: ...
 
-    async def get_all_forces(self, to_polars: bool = False) -> Any:
+    async def get_all_forces(
+        self, to_polars: bool = False
+    ) -> pl.DataFrame | List[ForceSummary]:
         """Return a list of all police forces (basic summary only).
 
         Args:
@@ -58,7 +60,7 @@ class AsyncForces(BaseResource):
 
     async def get_specific_force(
         self, force_id: str, to_polars: bool = False
-    ) -> Any:
+    ) -> pl.DataFrame | Force:
         """Return a specific police force by ID.
 
         Args:
@@ -86,7 +88,7 @@ class AsyncForces(BaseResource):
 
     async def get_specific_forces(
         self, force_ids: List[str], to_polars: bool = False
-    ) -> Any:
+    ) -> pl.DataFrame | List[Force]:
         """Return a list of police forces by ID in bulk.
 
         Args:
@@ -112,7 +114,9 @@ class AsyncForces(BaseResource):
         self, force_id: str, to_polars: Literal[False] = False
     ) -> List[Person]: ...
 
-    async def get_people(self, force_id: str, to_polars: bool = False) -> Any:
+    async def get_people(
+        self, force_id: str, to_polars: bool = False
+    ) -> pl.DataFrame | List[Person]:
         """Return a list of people (officers) in a specific police force.
 
         Args:
@@ -150,7 +154,9 @@ class Forces(BaseResource):
         self, to_polars: Literal[False] = False
     ) -> List[ForceSummary]: ...
 
-    def get_all_forces(self, to_polars: bool = False) -> Any:
+    def get_all_forces(
+        self, to_polars: bool = False
+    ) -> pl.DataFrame | List[ForceSummary]:
         """Return a list of all police forces (basic summary only).
 
         Args:
@@ -176,7 +182,7 @@ class Forces(BaseResource):
 
     def get_specific_force(
         self, force_id: str, to_polars: bool = False
-    ) -> Any:
+    ) -> pl.DataFrame | Force:
         """Return a specific police force by ID.
 
         Args:
@@ -204,7 +210,7 @@ class Forces(BaseResource):
 
     def get_specific_forces(
         self, force_ids: List[str], to_polars: bool = False
-    ) -> Any:
+    ) -> pl.DataFrame | List[Force]:
         """Return a list of police forces by ID in bulk.
 
         Args:
@@ -244,7 +250,9 @@ class Forces(BaseResource):
         self, force_id: str, to_polars: Literal[False] = False
     ) -> List[Person]: ...
 
-    def get_people(self, force_id: str, to_polars: bool = False) -> Any:
+    def get_people(
+        self, force_id: str, to_polars: bool = False
+    ) -> pl.DataFrame | List[Person]:
         """Return a list of people (officers) in a specific police force.
 
         Args:

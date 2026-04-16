@@ -21,7 +21,7 @@ class AsyncCrimes(BaseResource):
     """Crime-related Asynchronous API methods for the UK Police API.
 
     Args:
-        transport (AsyncTransport): The Transport Client
+        transport: The Transport Client
     """
 
     def __init__(self, transport: AsyncTransport) -> None:
@@ -61,7 +61,7 @@ class AsyncCrimes(BaseResource):
         poly: str | None = None,
         date: str | None = None,
         to_polars: bool = False,
-    ) -> List[CrimeReport]:
+    ) -> pl.DataFrame | List[CrimeReport]:
         """Return a list of crimes at a specific location.
 
         Args:
@@ -131,7 +131,7 @@ class AsyncCrimes(BaseResource):
         date: str | None = None,
         category: str | None = None,
         to_polars: bool = False,
-    ) -> List[CrimeReport]:
+    ) -> pl.DataFrame | List[CrimeReport]:
         """Return a list of crimes without a specific location.
 
         Args:
@@ -178,7 +178,7 @@ class AsyncCrimes(BaseResource):
         self,
         crime_id: str | int,
         to_polars: bool = False,
-    ) -> CrimeWithOutcomes:
+    ) -> pl.DataFrame | CrimeWithOutcomes:
         """Return a specific crime report by ID.
 
         Args:
@@ -208,7 +208,7 @@ class AsyncCrimes(BaseResource):
     async def get_crime_categories(
         self,
         to_polars: bool = False,
-    ) -> List[CrimeCategory]:
+    ) -> pl.DataFrame | List[CrimeCategory]:
         """Return a list of all crime categories.
 
         Args:
@@ -268,7 +268,7 @@ class Crimes(BaseResource):
         poly: str | None = None,
         date: str | None = None,
         to_polars: bool = False,
-    ) -> List[CrimeReport]:
+    ) -> pl.DataFrame | List[CrimeReport]:
         """Return a list of crimes at a specific location.
 
         Args:
@@ -338,7 +338,7 @@ class Crimes(BaseResource):
         date: str | None = None,
         category: str | None = None,
         to_polars: bool = False,
-    ) -> List[CrimeReport]:
+    ) -> pl.DataFrame | List[CrimeReport]:
         """Return a list of crimes without a specific location.
 
         Args:
@@ -385,7 +385,7 @@ class Crimes(BaseResource):
         self,
         crime_id: str | int,
         to_polars: bool = False,
-    ) -> CrimeWithOutcomes:
+    ) -> pl.DataFrame | CrimeWithOutcomes:
         """Return a specific crime report by ID.
 
         Args:
@@ -415,7 +415,7 @@ class Crimes(BaseResource):
     def get_crime_categories(
         self,
         to_polars: bool = False,
-    ) -> List[CrimeCategory]:
+    ) -> pl.DataFrame | List[CrimeCategory]:
         """Return a list of all crime categories.
 
         Args:
