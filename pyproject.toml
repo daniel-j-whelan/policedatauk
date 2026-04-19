@@ -1,6 +1,6 @@
 [project]
 name = "policedatauk"
-version = "0.1.0"
+version = "1.0.0"
 description = "Async Python wrapper for the UK Police Data API."
 authors = [{ name = "Daniel Whelan", email = "danieljwhelan@protonmail.com" }]
 readme = "README.md"
